@@ -1,58 +1,214 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Inventaris ATK
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi pengelolaan inventaris Alat Tulis Kantor: pencatatan stok, permintaan barang antar bidang, persetujuan, distribusi, stock opname, dan pelaporan — dengan hak akses berjenjang per peran.
 
-## About Laravel
+Dibangun dengan **Laravel 13** + **MySQL**. Tanpa langkah build frontend (aset sudah statis).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Kebutuhan Sistem
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Kebutuhan | Versi |
+|---|---|
+| PHP | **8.3** atau lebih baru |
+| Composer | 2.x |
+| MySQL / MariaDB | 5.7+ / 10.3+ |
+| Ekstensi PHP | `pdo_mysql`, `mbstring`, `openssl`, `gd`, `zip`, `fileinfo` |
 
-## Learning Laravel
+> Laragon, XAMPP, atau Herd sudah menyertakan semuanya. **Node.js/npm tidak diperlukan.**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Ambil kode & masuk foldernya
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <url-repository> inventaris-atk
+cd inventaris-atk
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Bila memakai Laragon, letakkan folder ini di `C:\laragon\www\` agar otomatis dapat domain `http://inventaris-atk.test`.
 
-## Contributing
+### 2. Pasang dependensi
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+### 3. Buat database kosong
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Buat database bernama **`inventaris_atk`** (lewat phpMyAdmin/HeidiSQL, atau perintah berikut):
 
-## Security Vulnerabilities
+```bash
+mysql -u root -e "CREATE DATABASE inventaris_atk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Siapkan berkas konfigurasi
 
-## License
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Buka `.env`, sesuaikan bila perlu:
+
+```env
+APP_URL=http://inventaris-atk.test
+
+DB_DATABASE=inventaris_atk
+DB_USERNAME=root
+DB_PASSWORD=            # isi bila MySQL Anda berpassword
+```
+
+### 5. Jalankan migrasi & data awal
+
+```bash
+php artisan migrate --seed
+```
+
+Perintah ini membuat seluruh tabel sekaligus mengisi data contoh (pengguna, bidang, kategori, barang, dan beberapa transaksi).
+
+### 6. Hubungkan storage publik
+
+```bash
+php artisan storage:link
+```
+
+Diperlukan agar logo/favicon yang diunggah lewat menu Pengaturan bisa tampil.
+
+---
+
+## Menjalankan Aplikasi
+
+**Dengan Laragon/XAMPP** — cukup nyalakan Apache + MySQL, lalu buka:
+
+```
+http://inventaris-atk.test
+```
+
+**Atau dengan server bawaan Laravel:**
+
+```bash
+php artisan serve
+```
+
+Lalu buka `http://127.0.0.1:8000`.
+
+### Akun untuk Masuk
+
+Semua akun contoh memakai password **`password`**:
+
+| Peran | Email | Hak akses utama |
+|---|---|---|
+| Administrator | `admin@siatk.test` | Seluruh sistem, master data, pengguna, pengaturan |
+| Kasubag Umum | `kasubag@siatk.test` | Menyetujui / menolak permintaan |
+| Petugas Gudang | `gudang@siatk.test` | Barang masuk, distribusi, stock opname |
+| Kepala Bidang | `kabid.tik@siatk.test` | Mengajukan permintaan untuk bidangnya |
+| Pimpinan | `pimpinan@siatk.test` | Melihat laporan & data barang |
+
+> Tersedia juga `kabid.keu@`, `kabid.sdm@`, dan `kabid.umum@siatk.test` untuk bidang lain.
+> **Ganti semua password ini sebelum dipakai sungguhan.**
+
+---
+
+## Penjadwalan Tugas Otomatis
+
+Beberapa fitur berjalan terjadwal: pengingat stok menipis, pembersihan Kotak Sampah, dan backup database. Agar aktif, jalankan penjadwal setiap menit.
+
+**Windows** — Task Scheduler → buat Basic Task, ulangi tiap 1 menit, jalankan `php.exe` dengan path lengkap:
+
+```
+"<path-php>\php.exe" C:\laragon\www\inventaris-atk\artisan schedule:run
+```
+
+Cari path PHP Anda lewat Command Prompt: `where php`
+(contoh hasil: `C:\php8.3\php.exe` atau `C:\laragon\bin\php\php-8.3.16-nts-Win32-vs16-x64\php.exe`)
+
+**Linux/macOS** — tambahkan ke crontab (`crontab -e`):
+
+```cron
+* * * * * cd /path/ke/inventaris-atk && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Jadwal bawaan:
+
+| Perintah | Waktu | Fungsi |
+|---|---|---|
+| `stock:check-minimum` | sesuai Pengaturan Email (default 07:00) | Notifikasi + email stok menipis |
+| `sampah:purge` | 02:00 | Hapus permanen isi Kotak Sampah > 30 hari |
+| `db:backup` | 01:30 | Backup database (retensi 14 hari) |
+
+Ketiganya juga bisa dijalankan manual, misalnya:
+
+```bash
+php artisan stock:check-minimum
+php artisan db:backup
+```
+
+> **Catatan `db:backup`:** perintah ini memakai `mysqldump`. Bila muncul pesan *"mysqldump is not recognized"*, isi `MYSQLDUMP_PATH` di `.env` (contohnya sudah tersedia di `.env.example`).
+
+---
+
+## Pengaturan Email (opsional)
+
+Notifikasi email (permintaan baru, persetujuan, distribusi, stok menipis) aktif setelah SMTP diisi. Ada dua cara:
+
+1. **Lewat aplikasi** — masuk sebagai admin → **Pengaturan › Email**, isi alamat & password aplikasi, lalu klik **Kirim Email Uji**. Password disimpan terenkripsi dan menimpa nilai di `.env`.
+2. **Lewat `.env`** — isi `MAIL_USERNAME`, `MAIL_PASSWORD`, dan `MAIL_FROM_ADDRESS`.
+
+> Untuk Gmail, gunakan **App Password** (bukan password akun biasa).
+
+---
+
+## Menjalankan Pengujian
+
+```bash
+php artisan test
+```
+
+Pengujian memakai SQLite di memori, jadi **tidak menyentuh database asli**.
+
+---
+
+## Perintah yang Sering Dipakai
+
+```bash
+php artisan migrate:fresh --seed   # reset database + isi ulang data contoh
+php artisan optimize:clear         # bersihkan semua cache (config, route, view)
+php artisan view:clear             # bersihkan cache tampilan saja
+```
+
+> Bila tampilan terlihat berantakan setelah pembaruan, biasanya karena cache browser — muat ulang paksa dengan **Ctrl + Shift + R**.
+
+---
+
+## Struktur Peran
+
+| Peran | Ringkasan |
+|---|---|
+| **Administrator** | Akses penuh: master data, pengguna, kuota, audit log, pengaturan, Kotak Sampah |
+| **Kasubag Umum** | Menyetujui/menolak permintaan, melihat laporan & data barang |
+| **Petugas Gudang** | Barang masuk, distribusi, stock opname, data barang |
+| **Kepala Bidang** | Mengajukan permintaan & memantau sisa kuota bidangnya sendiri |
+| **Pimpinan** | Hanya melihat laporan dan data barang |
+
+---
+
+## Menyiapkan untuk Produksi
+
+Jangan pakai konfigurasi lokal di server. Ikuti checklist lengkap di **[DEPLOYMENT.md](DEPLOYMENT.md)** — mencakup `.env` produksi (`APP_DEBUG=false`, HTTPS, cookie aman), optimasi cache, penjadwal, dan keamanan server.
+
+---
+
+## Pemecahan Masalah
+
+| Gejala | Penyebab & solusi |
+|---|---|
+| `SQLSTATE[HY000] [1049] Unknown database` | Database `inventaris_atk` belum dibuat — ulangi langkah 3 |
+| `No application encryption key has been specified` | Jalankan `php artisan key:generate` |
+| Logo/gambar tidak muncul | Jalankan `php artisan storage:link` |
+| Tampilan berantakan setelah update | Cache browser — tekan **Ctrl + Shift + R** |
+| `mysqldump is not recognized` saat backup | Isi `MYSQLDUMP_PATH` di `.env` |
+| Peringatan unduhan "not secure" di Chrome | Akses lewat `https://` (aktifkan SSL Laragon: klik kanan Laragon → Apache → SSL) |
+| Email tidak terkirim | Cek Pengaturan › Email, gunakan App Password untuk Gmail |
