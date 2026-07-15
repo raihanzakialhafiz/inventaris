@@ -33,14 +33,12 @@ class LoginController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        // Akun tidak ditemukan atau tidak aktif
         if (!$user || !$user->is_active) {
             throw ValidationException::withMessages([
                 'email' => 'Email atau password salah.',
             ]);
         }
 
-        // Cek lockout
         if ($user->isLocked()) {
             $menit = now()->diffInMinutes($user->locked_until) + 1;
             throw ValidationException::withMessages([
@@ -48,7 +46,6 @@ class LoginController extends Controller
             ]);
         }
 
-        // Verifikasi password
         if (!Hash::check($request->password, $user->password)) {
             $user->increment('failed_login_count');
 
@@ -66,7 +63,6 @@ class LoginController extends Controller
             ]);
         }
 
-        // Login berhasil — reset counter
         $user->update(['failed_login_count' => 0, 'locked_until' => null]);
 
         Auth::login($user, $request->boolean('remember'));
