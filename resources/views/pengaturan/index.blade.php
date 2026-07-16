@@ -5,14 +5,27 @@
 
 @section('content')
 <style>
-  .settings { max-width: 900px; }
-  .set-row {
-    display: grid; grid-template-columns: 250px 1fr; gap: 28px;
-    padding: 26px 0; border-bottom: 1px solid var(--line);
+  /* Tata letak tab: kartu nav di kiri, kartu isi di kanan. */
+  .set-wrap { display: grid; grid-template-columns: 230px 1fr; gap: 22px; align-items: start; }
+  .set-nav {
+    position: sticky; top: 16px; display: flex; flex-direction: column; gap: 4px;
+    padding: 10px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
   }
-  .set-row:first-child { padding-top: 8px; }
-  .set-side h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-  .set-side p  { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .set-nav button {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 10px 12px; border: 0; border-radius: 10px; cursor: pointer;
+    background: transparent; color: var(--muted);
+    font: inherit; font-size: 13.5px; font-weight: 600;
+  }
+  .set-nav button:hover { background: var(--surface-2); color: var(--ink); }
+  .set-nav button.on { background: var(--primary-soft); color: var(--primary-dark); }
+  .set-nav button svg { flex: 0 0 auto; }
+  .settings { max-width: 780px; min-width: 0; }
+  /* Judul & deskripsi bagian pindah ke kepala kartu (dulu kolom kiri). */
+  .set-card { margin-bottom: 18px; }
+  .set-card .card-h h3 { margin-bottom: 3px; }
+  .set-card .card-h p { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
   .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .set-grid .full { grid-column: 1 / -1; }
   /* Kotak unggah gambar */
@@ -24,65 +37,159 @@
   .img-box .meta { min-width: 0; flex: 1; }
   .img-box .meta b { font-size: 13px; }
   .img-box .meta span { display: block; font-size: 12px; color: var(--muted); }
-  .file-drop { display: block; }
+  /* Pratinjau kop — meniru proporsi template PDF (logo kiri, teks terpusat
+     pada halaman, garis tebal penutup). Perkiraan tampilan, bukan ukuran
+     presisi: yang dijaga urutan baris & tata letaknya. */
+  .kop-prev {
+    margin-top: 16px; padding: 16px; border: 1px solid var(--line);
+    border-radius: 12px; background: #fff; color: #000;
+  }
+  .kop-prev-lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .kp-row { display: flex; align-items: center; border-bottom: 3px solid #000; padding-bottom: 6px; }
+  .kp-side { width: 96px; flex: 0 0 auto; }
+  .kp-side img { width: 40px; height: 40px; object-fit: contain; margin-left: 52px; display: block; }
+  .kp-teks { flex: 1; min-width: 0; text-align: center; }
+  .kp-teks p { margin: 0; overflow-wrap: anywhere; }
+  .kp-g { font-size: 11px; }
+  .kp-i { font-size: 15px; font-weight: 700; }
+  .kp-a { font-size: 8.5px; }
+  .kp-judul { text-align: center; font-size: 12px; font-weight: 700; margin: 12px 0 0; }
   .save-bar {
     position: sticky; bottom: 0; margin-top: 22px; padding: 14px 0;
     background: linear-gradient(to top, var(--surface) 60%, transparent);
     display: flex; justify-content: flex-end; gap: 10px;
   }
-  @media (max-width: 720px) { .set-row { grid-template-columns: 1fr; gap: 12px; } .set-grid { grid-template-columns: 1fr; } }
+  /* Layar sempit: nav jadi baris ikon yang bisa digeser mendatar. */
+  @media (max-width: 900px) {
+    .set-wrap { grid-template-columns: 1fr; }
+    .set-nav { position: static; flex-direction: row; overflow-x: auto; }
+    .set-nav button { width: auto; white-space: nowrap; }
+  }
+  @media (max-width: 720px) { .set-grid { grid-template-columns: 1fr; } }
 </style>
 
+@php
+  $tabs = [
+    'identitas' => ['Identitas', 'tag'],
+    'kop'       => ['Kop Surat', 'file-text'],
+    'ttd'       => ['Penanda Tangan', 'scroll'],
+    'logo'      => ['Logo & Favicon', 'image'],
+    'login'     => ['Halaman Login', 'user'],
+    'kontak'    => ['Kontak & Footer', 'mail'],
+    'keamanan'  => ['Keamanan Sesi', 'shield'],
+  ];
+@endphp
+
+{{-- Tab memakai x-show (bukan x-if): isian tab tersembunyi HARUS tetap ada di
+     DOM agar ikut terkirim — seluruh halaman ini satu form dengan satu tombol
+     simpan. --}}
+<div class="page-head">
+  <h2>Pengaturan Sistem</h2>
+  <p>Konfigurasi global aplikasi {{ setting('app_name', 'SIIB') }} — perubahan langsung berlaku di seluruh sistem.</p>
+</div>
+
+<div class="set-wrap" x-data="{ tab: 'identitas' }">
+<nav class="set-nav">
+  @foreach($tabs as $id => [$label, $ikon])
+    <button type="button" :class="{ 'on': tab === '{{ $id }}' }" @click="tab = '{{ $id }}'">
+      <x-icon name="{{ $ikon }}" width="16" height="16" /> {{ $label }}
+    </button>
+  @endforeach
+</nav>
+
 <div class="settings">
-  <div class="page-head">
-    <h2>Pengaturan Sistem</h2>
-    <p>Identitas, tampilan, dan keamanan aplikasi. Perubahan langsung berlaku di seluruh sistem.</p>
-  </div>
 
   @if($errors->any())
     <div class="notice warn" style="margin-bottom:16px"><span class="ic">⚠</span><div>{{ $errors->first() }}</div></div>
   @endif
 
-  <form method="POST" action="{{ route('pengaturan.update') }}" enctype="multipart/form-data">
+  {{-- Isian wajib yang tersembunyi tidak bisa difokuskan browser: form akan
+       menolak submit TANPA pesan apa pun. Pindah ke tab yang bermasalah dulu
+       agar pesan validasinya terlihat. --}}
+  <form method="POST" action="{{ route('pengaturan.update') }}" enctype="multipart/form-data"
+        @invalid.capture="tab = $event.target.closest('[data-tab]')?.dataset.tab ?? tab">
     @csrf
     @method('PUT')
 
     {{-- Identitas --}}
-    <div class="set-row">
-      <div class="set-side">
-        <h3>Identitas Aplikasi</h3>
-        <p>Nama aplikasi tampil di sidebar &amp; judul tab. Tiga isian lainnya menyusun kop laporan, berurutan dari atas ke bawah.</p>
+    <div class="card set-card" data-tab="identitas" x-show="tab === 'identitas'" x-cloak>
+      <div class="card-h">
+        <h3>Informasi Aplikasi</h3>
+        <p>Nama singkat yang tampil di sidebar dan judul tab browser.</p>
       </div>
-      <div class="set-main">
+      <div class="card-b">
+        <div class="field" style="margin:0;max-width:280px">
+          <label>Nama Aplikasi <span style="color:var(--danger)">*</span></label>
+          <input type="text" name="app_name" value="{{ old('app_name', $settings['app_name'] ?? 'SIIB') }}" required>
+          <span class="help">Singkat, mis. “BKD”.</span>
+        </div>
+      </div>
+    </div>
+
+    {{-- Kop surat: keempat barisnya dikumpulkan di satu tempat, urut sesuai
+         tampilannya di laporan, dengan pratinjau langsung. --}}
+    <div class="card set-card" data-tab="kop" x-show="tab === 'kop'" x-cloak
+         x-data='{
+           gov:  @json(old('government_name', $settings['government_name'] ?? '')),
+           inst: @json(old('institution_name', $settings['institution_name'] ?? '')),
+           addr: @json(old('address', $settings['address'] ?? '')),
+           mail: @json(old('contact_email', $settings['contact_email'] ?? ''))
+         }'>
+      <div class="card-h">
+        <h3>Kop Surat Laporan</h3>
+        <p>Empat baris identitas pada kop laporan PDF &amp; Excel, urut dari atas ke bawah. Kosongkan baris yang tidak dipakai.</p>
+      </div>
+      <div class="card-b">
         <div class="set-grid">
-          <div class="field" style="margin:0">
-            <label>Nama Aplikasi <span style="color:var(--danger)">*</span></label>
-            <input type="text" name="app_name" value="{{ old('app_name', $settings['app_name'] ?? 'SIIB') }}" required>
-            <span class="help">Singkat, mis. “BKD”.</span>
-          </div>
-          <div class="field" style="margin:0">
-            <label>Induk Pemerintahan <span class="help">baris 1 kop</span></label>
-            <input type="text" name="government_name" value="{{ old('government_name', $settings['government_name'] ?? '') }}" placeholder="mis. PEMERINTAH PROVINSI SUMATERA BARAT">
+          <div class="field full" style="margin:0">
+            <label>Baris 1 — Induk Pemerintahan</label>
+            <input type="text" name="government_name" x-model="gov" placeholder="mis. PEMERINTAH PROVINSI SUMATERA BARAT">
           </div>
           <div class="field full" style="margin:0">
-            <label>Nama Instansi <span class="help">baris 2 kop — juga tampil di sidebar, halaman login &amp; email</span></label>
-            <input type="text" name="institution_name" value="{{ old('institution_name', $settings['institution_name'] ?? '') }}" placeholder="mis. BADAN KEPEGAWAIAN DAERAH">
+            <label>Baris 2 — Nama Instansi <span class="help">juga tampil di sidebar, halaman login &amp; email</span></label>
+            <input type="text" name="institution_name" x-model="inst" placeholder="mis. BADAN KEPEGAWAIAN DAERAH">
           </div>
           <div class="field full" style="margin:0">
-            <label>Alamat Instansi <span class="help">baris 3 kop — tulis utuh termasuk telepon, fax, dan kota</span></label>
-            <input type="text" name="address" value="{{ old('address', $settings['address'] ?? '') }}" placeholder="mis. Jalan Batang Antokan No. 4 Telepon (0751) 7054124 Fax. (0751) 7054804 Padang">
+            <label>Baris 3 — Alamat <span class="help">tulis utuh termasuk telepon, fax, dan kota</span></label>
+            <input type="text" name="address" x-model="addr" placeholder="mis. Jalan Batang Antokan No. 4 Telepon (0751) 7054124 Fax. (0751) 7054804 Padang">
           </div>
+          <div class="field full" style="margin:0">
+            <label>Baris 4 — Email</label>
+            <input type="email" name="contact_email" x-model="mail" placeholder="mis. bkd@sumbarprov.go.id">
+          </div>
+        </div>
+
+        <div class="kop-prev">
+          <div class="kop-prev-lbl">Pratinjau</div>
+          <div class="kp-row">
+            <div class="kp-side">
+              @if(!empty($settings['logo']))
+                <img src="{{ asset('storage/'.$settings['logo']) }}" alt="Logo">
+              @endif
+            </div>
+            <div class="kp-teks">
+              <p class="kp-g" x-show="gov.trim()" x-text="gov" x-cloak></p>
+              <p class="kp-i" x-text="inst.trim() || 'Nama Instansi'"></p>
+              <p class="kp-a" x-show="addr.trim()" x-text="addr" x-cloak></p>
+              <p class="kp-a" x-show="mail.trim()" x-text="'email : ' + mail" x-cloak></p>
+            </div>
+            <div class="kp-side"></div>
+          </div>
+          <p class="kp-judul">JUDUL LAPORAN</p>
         </div>
       </div>
     </div>
 
     {{-- Penanda tangan laporan --}}
-    <div class="set-row">
-      <div class="set-side">
+    <div class="card set-card" data-tab="ttd" x-show="tab === 'ttd'" x-cloak>
+      <div class="card-h">
         <h3>Penanda Tangan Laporan</h3>
         <p>Pejabat yang tanda tangannya dapat disertakan saat ekspor PDF/Excel. Nama, NIP, dan jabatan diambil dari data pengguna — cukup perbarui di Manajemen Pengguna bila berubah.</p>
       </div>
-      <div class="set-main">
+      <div class="card-b">
         <div class="set-grid">
           <div class="field" style="margin:0">
             <label>Pejabat Penanda Tangan</label>
@@ -101,12 +208,12 @@
     </div>
 
     {{-- Logo & Favicon --}}
-    <div class="set-row">
-      <div class="set-side">
+    <div class="card set-card" data-tab="logo" x-show="tab === 'logo'" x-cloak>
+      <div class="card-h">
         <h3>Logo &amp; Favicon</h3>
-        <p>Logo tampil di sidebar & login. Favicon adalah ikon kecil di tab browser.</p>
+        <p>Logo tampil di sidebar, halaman login, dan kop laporan. Favicon adalah ikon kecil di tab browser.</p>
       </div>
-      <div class="set-main">
+      <div class="card-b">
         <div class="set-grid">
           <div class="field" style="margin:0">
             <label>Logo</label>
@@ -117,8 +224,7 @@
                 <button type="submit" form="del-logo-form" class="btn btn-danger btn-sm">✕ Hapus</button>
               </div>
             @endif
-            <input type="file" name="logo" accept="image/*" class="inp file-drop">
-            <span class="help">PNG / JPG / WEBP, maks 1 MB</span>
+            <x-file-drop name="logo" accept="image/png,image/jpeg,image/webp" hint="PNG / JPG / WEBP · maks 1 MB" />
           </div>
           <div class="field" style="margin:0">
             <label>Favicon</label>
@@ -129,20 +235,19 @@
                 <button type="submit" form="del-favicon-form" class="btn btn-danger btn-sm">✕ Hapus</button>
               </div>
             @endif
-            <input type="file" name="favicon" accept="image/*" class="inp file-drop">
-            <span class="help">PNG / ICO, maks 256 KB</span>
+            <x-file-drop name="favicon" accept="image/png,image/x-icon,.ico" hint="PNG / ICO · maks 256 KB" />
           </div>
         </div>
       </div>
     </div>
 
     {{-- Tampilan Login --}}
-    <div class="set-row">
-      <div class="set-side">
+    <div class="card set-card" data-tab="login" x-show="tab === 'login'" x-cloak>
+      <div class="card-h">
         <h3>Tampilan Halaman Login</h3>
         <p>Gambar latar di sisi kanan halaman login (hero). Kosongkan untuk memakai gradasi default.</p>
       </div>
-      <div class="set-main">
+      <div class="card-b">
         <div class="field" style="margin:0;max-width:460px">
           <label>Gambar Latar Login</label>
           @if(!empty($settings['login_image']))
@@ -154,29 +259,26 @@
               </div>
             </div>
           @endif
-          <input type="file" name="login_image" accept="image/*" class="inp file-drop">
-          <span class="help">PNG / JPG / WEBP, maks 3 MB · rasio landscape disarankan</span>
+          <x-file-drop name="login_image" accept="image/png,image/jpeg,image/webp"
+                       hint="PNG / JPG / WEBP · maks 3 MB · rasio landscape disarankan" />
         </div>
       </div>
     </div>
 
-    {{-- Kontak & Footer --}}
-    <div class="set-row">
-      <div class="set-side">
+    {{-- Kontak & Footer — Email Kontak dipindah ke bagian Kop Surat karena
+         ia baris ke-4 kop, bukan sekadar informasi kontak. --}}
+    <div class="card set-card" data-tab="kontak" x-show="tab === 'kontak'" x-cloak>
+      <div class="card-h">
         <h3>Kontak &amp; Footer</h3>
-        <p>Informasi kontak instansi dan teks footer laporan.</p>
+        <p>Telepon instansi dan teks footer yang tampil di kaki laporan.</p>
       </div>
-      <div class="set-main">
+      <div class="card-b">
         <div class="set-grid">
-          <div class="field" style="margin:0">
-            <label>Email Kontak</label>
-            <input type="email" name="contact_email" value="{{ old('contact_email', $settings['contact_email'] ?? '') }}">
-          </div>
           <div class="field" style="margin:0">
             <label>Telepon Kontak</label>
             <input type="text" name="contact_phone" value="{{ old('contact_phone', $settings['contact_phone'] ?? '') }}">
           </div>
-          <div class="field full" style="margin:0">
+          <div class="field" style="margin:0">
             <label>Teks Footer</label>
             <input type="text" name="footer_text" value="{{ old('footer_text', $settings['footer_text'] ?? '') }}">
           </div>
@@ -185,12 +287,12 @@
     </div>
 
     {{-- Keamanan --}}
-    <div class="set-row">
-      <div class="set-side">
+    <div class="card set-card" data-tab="keamanan" x-show="tab === 'keamanan'" x-cloak>
+      <div class="card-h">
         <h3>Keamanan Sesi</h3>
         <p>Durasi tidak aktif sebelum pengguna otomatis keluar demi keamanan.</p>
       </div>
-      <div class="set-main">
+      <div class="card-b">
         <div class="field" style="margin:0;max-width:220px">
           <label>Batas Waktu Sesi (menit) <span style="color:var(--danger)">*</span></label>
           <input type="number" name="session_timeout" min="1" max="1440" step="1"
@@ -212,5 +314,6 @@
       @csrf @method('DELETE')
     </form>
   @endforeach
+</div>
 </div>
 @endsection

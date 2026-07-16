@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\ActionNotificationMail;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 
@@ -26,10 +27,19 @@ class PengaturanEmailController extends Controller
 
     public function index()
     {
-        $settings = Setting::pluck('value', 'key');
+        $settings    = Setting::pluck('value', 'key');
         $hasPassword = filled($settings['mail_password'] ?? null);
 
-        return view('pengaturan-email.index', compact('settings', 'hasPassword'));
+        // Email baru bisa terkirim bila akun DAN password sama-sama terisi;
+        // salah satu kosong = jatuh ke .env, yang belum tentu diisi.
+        $configured = $hasPassword && filled($settings['mail_from_address'] ?? config('mail.from.address'));
+
+        // Ditulis penjadwal tiap kali email stok menipis terkirim.
+        $lastSent = filled($settings['stock_alert_last_sent'] ?? null)
+            ? Carbon::parse($settings['stock_alert_last_sent'])
+            : null;
+
+        return view('pengaturan-email.index', compact('settings', 'hasPassword', 'configured', 'lastSent'));
     }
 
     public function update(Request $request)
