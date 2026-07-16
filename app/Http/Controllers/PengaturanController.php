@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdatePengaturanRequest;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,19 +13,29 @@ class PengaturanController extends Controller
     /** Kunci teks yang boleh diubah beserta tipenya. */
     private const TEXT_KEYS = [
         'app_name'         => 'text',
+        'government_name'  => 'text',
         'institution_name' => 'text',
         'address'          => 'text',
         'footer_text'      => 'text',
         'contact_email'    => 'email',
         'contact_phone'    => 'phone',
         'session_timeout'  => 'number',
+        'signer_user_id'   => 'number',
+        'signature_place'  => 'text',
     ];
 
     public function index()
     {
         $settings = Setting::pluck('value', 'key');
 
-        return view('pengaturan.index', compact('settings'));
+        // Kandidat penanda tangan: akun aktif saja — pejabat nonaktif tidak
+        // boleh muncul sebagai penanda tangan dokumen baru.
+        $signers = User::where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (User $u) => [$u->id => $u->name.' · '.$u->jabatanLabel()]);
+
+        return view('pengaturan.index', compact('settings', 'signers'));
     }
 
     public function update(UpdatePengaturanRequest $request)

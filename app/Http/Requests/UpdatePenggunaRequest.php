@@ -18,6 +18,10 @@ class UpdatePenggunaRequest extends FormRequest
         return [
             'name'          => 'required|string|max:150',
             'email'         => ['required', 'email', Rule::unique('users', 'email')->ignore($this->route('pengguna'))],
+            // Sengaja tidak dipaksa 18 digit: format NIP berbeda antar status
+            // kepegawaian, dan tidak semua pengguna sistem punya NIP.
+            'nip'           => 'nullable|string|max:30',
+            'jabatan'       => 'nullable|string|max:150',
             // Opsional saat edit; bila diisi ikut kebijakan password seragam.
             'password'      => ['nullable', 'string', 'min:8', 'regex:/[a-zA-Z]/', 'regex:/[0-9]/'],
             'role'          => 'required|in:admin,kasubag_umum,petugas_gudang,kepala_bidang,pimpinan',

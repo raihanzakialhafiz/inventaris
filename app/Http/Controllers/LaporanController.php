@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\LaporanExport;
 use App\Models\Department;
+use App\Support\ExportTable;
 use App\Models\Item;
 use App\Models\Request as ItemRequest;
 use App\Models\StockIn;
@@ -70,11 +71,11 @@ class LaporanController extends Controller
             : now()->format('Y-m');
         $deptId = $user->role === 'kepala_bidang' ? $user->department_id : $request->get('dept');
 
-        return [$type, $period, $deptId];
+        return [$type, $period, $deptId, $request->boolean('ttd')];
     }
 
     /** Bentuk tabular (judul, header, baris) untuk ekspor — memakai query yang sama dengan tampilan. */
-    private function tableFor(string $type, string $period, ?int $deptId): array
+    private function tableFor(string $type, string $period, ?int $deptId, bool $withSigner = false): array
     {
         $dept    = $deptId ? Department::find($deptId) : null;
         $headers = [];
@@ -125,19 +126,20 @@ class LaporanController extends Controller
 
         $periodLabel = in_array($type, ['stok'], true) ? null : $period;
 
-        return [
-            'type'        => $type,
-            'title'       => self::TYPES[$type],
-            'headers'     => $headers,
-            'rows'        => $rows,
-            'period'      => $periodLabel,
-            'deptName'    => $dept?->name,
-            'filename'    => 'laporan-' . $type . '-' . ($periodLabel ?? now()->format('Y-m')),
-            'institution' => setting('institution_name', 'Instansi'),
-            'appName'     => setting('app_name', 'SIIB'),
-            'address'     => setting('address'),
-            'logo'        => setting('logo') ? public_path('storage/' . setting('logo')) : null,
-        ];
+        // 'type' ditimpa: ExportTable memakai 'umum', sedangkan di sini tipe
+        // laporan yang sebenarnya menentukan orientasi kertas PDF.
+        return array_merge(
+            ExportTable::make(
+                self::TYPES[$type],
+                $headers,
+                $rows,
+                'laporan-' . $type . '-' . ($periodLabel ?? now()->format('Y-m')),
+                $periodLabel,
+                $dept?->name,
+                $withSigner,
+            ),
+            ['type' => $type],
+        );
     }
 
     private function laporanStok(): array

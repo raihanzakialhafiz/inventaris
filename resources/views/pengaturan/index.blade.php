@@ -51,21 +51,50 @@
     <div class="set-row">
       <div class="set-side">
         <h3>Identitas Aplikasi</h3>
-        <p>Nama aplikasi & instansi yang tampil di sidebar, judul tab, dan kop laporan.</p>
+        <p>Nama aplikasi tampil di sidebar &amp; judul tab. Tiga isian lainnya menyusun kop laporan, berurutan dari atas ke bawah.</p>
       </div>
       <div class="set-main">
         <div class="set-grid">
           <div class="field" style="margin:0">
             <label>Nama Aplikasi <span style="color:var(--danger)">*</span></label>
             <input type="text" name="app_name" value="{{ old('app_name', $settings['app_name'] ?? 'SIIB') }}" required>
+            <span class="help">Singkat, mis. “BKD”.</span>
           </div>
           <div class="field" style="margin:0">
-            <label>Nama Instansi</label>
-            <input type="text" name="institution_name" value="{{ old('institution_name', $settings['institution_name'] ?? '') }}">
+            <label>Induk Pemerintahan <span class="help">baris 1 kop</span></label>
+            <input type="text" name="government_name" value="{{ old('government_name', $settings['government_name'] ?? '') }}" placeholder="mis. PEMERINTAH PROVINSI SUMATERA BARAT">
           </div>
           <div class="field full" style="margin:0">
-            <label>Alamat Instansi <span class="help">tampil pada kop laporan</span></label>
-            <input type="text" name="address" value="{{ old('address', $settings['address'] ?? '') }}">
+            <label>Nama Instansi <span class="help">baris 2 kop — juga tampil di sidebar, halaman login &amp; email</span></label>
+            <input type="text" name="institution_name" value="{{ old('institution_name', $settings['institution_name'] ?? '') }}" placeholder="mis. BADAN KEPEGAWAIAN DAERAH">
+          </div>
+          <div class="field full" style="margin:0">
+            <label>Alamat Instansi <span class="help">baris 3 kop — tulis utuh termasuk telepon, fax, dan kota</span></label>
+            <input type="text" name="address" value="{{ old('address', $settings['address'] ?? '') }}" placeholder="mis. Jalan Batang Antokan No. 4 Telepon (0751) 7054124 Fax. (0751) 7054804 Padang">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{-- Penanda tangan laporan --}}
+    <div class="set-row">
+      <div class="set-side">
+        <h3>Penanda Tangan Laporan</h3>
+        <p>Pejabat yang tanda tangannya dapat disertakan saat ekspor PDF/Excel. Nama, NIP, dan jabatan diambil dari data pengguna — cukup perbarui di Manajemen Pengguna bila berubah.</p>
+      </div>
+      <div class="set-main">
+        <div class="set-grid">
+          <div class="field" style="margin:0">
+            <label>Pejabat Penanda Tangan</label>
+            <x-searchable-select name="signer_user_id" :options="$signers"
+                                 :selected="old('signer_user_id', $settings['signer_user_id'] ?? '')"
+                                 placeholder="— Tidak ada —" search-placeholder="Cari pengguna…" />
+            <span class="help">Kosongkan bila laporan tidak pernah perlu tanda tangan pimpinan.</span>
+          </div>
+          <div class="field" style="margin:0">
+            <label>Tempat Penandatanganan</label>
+            <input type="text" name="signature_place" value="{{ old('signature_place', $settings['signature_place'] ?? '') }}" placeholder="mis. Padang">
+            <span class="help">Mendahului tanggal, mis. “Padang, 16 Juli 2026”.</span>
           </div>
         </div>
       </div>

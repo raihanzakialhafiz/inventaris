@@ -5,14 +5,23 @@
   <style>
     * { box-sizing: border-box; }
     body { font-family: DejaVu Sans, sans-serif; color: #1e293b; font-size: 11px; margin: 0; }
-    .kop { border-bottom: 2.5px solid #0f766e; padding-bottom: 10px; margin-bottom: 14px; }
+    /* Kop surat dinas: teks terpusat pada halaman dengan logo di kiri, garis
+       tebal sebagai penutup. Semua hitam — dokumen resmi kerap dicetak B/W. */
+    .kop { border-bottom: 3px solid #000; padding-bottom: 6px; margin-bottom: 12px; color: #000; }
     .kop table { width: 100%; border: none; }
     .kop td { border: none; vertical-align: middle; padding: 0; }
-    .kop .logo { width: 56px; }
-    .kop .logo img { width: 50px; height: 50px; object-fit: contain; }
-    .kop h1 { font-size: 17px; margin: 0; color: #0f766e; }
-    .kop .inst { font-size: 12px; font-weight: bold; margin: 0; }
-    .kop .addr { font-size: 10px; color: #64748b; margin: 2px 0 0; }
+    /* Lebar sel logo & sel penyeimbang WAJIB sama, jika tidak teks kop lepas
+       dari titik tengah halaman. Logo digeser lewat margin di dalam selnya,
+       bukan dengan mengubah lebar sel. */
+    .kop .logo { width: 140px; }
+    .kop .logo img { width: 58px; height: 58px; margin-left: 75px; }
+    .kop .teks { text-align: center; }
+    .kop .pem { font-size: 11px; margin: 0; }
+    .kop .inst { font-size: 15px; font-weight: bold; margin: 0; }
+    .kop .addr { font-size: 8px; margin: 1px 0 0; }
+    /* Judul berdiri sendiri di bawah kop, bukan bagian dari identitas instansi. */
+    .judul { text-align: center; margin-bottom: 12px; color: #000; }
+    .judul h1 { font-size: 13px; font-weight: bold; margin: 0; text-transform: uppercase; }
     .meta { font-size: 10px; color: #475569; margin-bottom: 10px; }
     .meta b { color: #1e293b; }
     table.data { width: 100%; border-collapse: collapse; }
@@ -20,29 +29,52 @@
     table.data td { border-bottom: 1px solid #e2e8f0; padding: 5px 8px; font-size: 10px; }
     table.data tr:nth-child(even) td { background: #f6f9f8; }
     .empty { text-align: center; padding: 24px; color: #94a3b8; }
+    /* page-break-inside: jangan sampai nama terpisah dari jabatannya antar halaman. */
+    table.ttd { width: 100%; margin-top: 30px; border: none; page-break-inside: avoid; }
+    table.ttd td { border: none; vertical-align: top; padding: 0; font-size: 10px; }
+    /* Blok menyusut selebar baris terpanjangnya lalu menempel ke margin kanan,
+       berapa pun panjang jabatannya. Lebar tetap (mis. 35%) tidak bisa: jabatan
+       pendek menyisakan celah lebar di kanan, jabatan panjang terpotong.
+
+       width:1% + nowrap wajib berpasangan. nowrap saja tidak cukup: pada tabel
+       width:100% sisa lebar justru dilimpahkan ke sel ini (sel kosong punya
+       max-content 0), sehingga blok malah melebar penuh dan jatuh ke kiri.
+       width:1% memaksanya ke min-content; sel kosong menyerap sisanya.
+
+       padding-right memberi jarak dari tepi kertas: sel menempel margin kanan,
+       jadi padding-nya mendorong teks ke kiri tanpa mengunci lebar blok. */
+    table.ttd .blok { width: 1%; white-space: nowrap; padding-right: 30px; }
+    table.ttd .ruang { height: 58px; }
+    table.ttd .nama { font-weight: bold; text-decoration: underline; }
     .foot { margin-top: 18px; font-size: 9px; color: #94a3b8; text-align: right; }
   </style>
 </head>
 <body>
+  @php $adaLogo = $logo && file_exists($logo); @endphp
   <div class="kop">
     <table>
       <tr>
-        @if($logo && file_exists($logo))
-          <td class="logo"><img src="{{ $logo }}" alt="Logo"></td>
-        @endif
-        <td>
+        @if($adaLogo)<td class="logo"><img src="{{ $logo }}" alt="Logo"></td>@endif
+        <td class="teks">
+          @if($government)<p class="pem">{{ $government }}</p>@endif
           <p class="inst">{{ $institution }}</p>
-          <h1>{{ $title }}</h1>
           @if($address)<p class="addr">{{ $address }}</p>@endif
+          @if($email)<p class="addr">email : {{ $email }}</p>@endif
         </td>
+        {{-- Sel kosong penyeimbang selebar logo: tanpa ini teks terpusat pada
+             sisa ruang di kanan logo, bukan pada halaman. --}}
+        @if($adaLogo)<td class="logo"></td>@endif
       </tr>
     </table>
   </div>
+
+  <div class="judul"><h1>{{ $title }}</h1></div>
 
   <div class="meta">
     @if($period)<b>Periode:</b> {{ $period }} &nbsp;&nbsp;@endif
     @if($deptName)<b>Bidang:</b> {{ $deptName }} &nbsp;&nbsp;@endif
     <b>Dicetak:</b> {{ now()->format('d/m/Y H:i') }}
+    @if($exporter)&nbsp;&nbsp;<b>Oleh:</b> {{ $exporter['name'] }}@endif
   </div>
 
   @if(count($rows))
@@ -58,6 +90,22 @@
     </table>
   @else
     <div class="empty">Tidak ada data untuk parameter ini.</div>
+  @endif
+
+  @if($signer)
+    <table class="ttd">
+      <tr>
+        {{-- Sel kosong menyerap sisa lebar dan mendorong blok ke margin kanan;
+             DomPDF tidak menangani float/margin-left:auto pada tabel seandal ini. --}}
+        <td></td>
+        <td class="blok">
+          {{ $place ? $place . ', ' : '' }}{{ now()->isoFormat('D MMMM YYYY') }}<br>{{ $signer['jabatan'] }}
+          <div class="ruang"></div>
+          <span class="nama">{{ $signer['name'] }}</span><br>
+          NIP. {{ $signer['nip'] ?: '-' }}
+        </td>
+      </tr>
+    </table>
   @endif
 
   <div class="foot">{{ $appName }} · {{ setting('footer_text', 'Sistem Inventaris ATK') }}</div>

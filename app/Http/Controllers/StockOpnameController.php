@@ -6,6 +6,7 @@ use App\Http\Requests\StoreStockOpnameRequest;
 use App\Models\AuditLog;
 use App\Models\Item;
 use App\Models\StockOpname;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -90,7 +91,7 @@ class StockOpnameController extends Controller
     }
 
     /** Cetak berita acara satu sesi opname (PDF). */
-    public function export(StockOpname $stockOpname)
+    public function export(Request $request, StockOpname $stockOpname)
     {
         $stockOpname->load(['details.item', 'createdBy']);
 
@@ -109,6 +110,7 @@ class StockOpnameController extends Controller
             'stock-opname-' . $stockOpname->opname_no,
             optional($stockOpname->date)->format('d/m/Y'),
             'Petugas: ' . ($stockOpname->createdBy->name ?? '—'),
+            withSignerSignature: $request->boolean('ttd'),
         );
 
         return \Barryvdh\DomPDF\Facade\Pdf::loadView('laporan.pdf', $table)

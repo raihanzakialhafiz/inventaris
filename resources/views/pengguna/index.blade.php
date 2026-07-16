@@ -76,7 +76,7 @@
                 </td>
                 <td style="white-space:nowrap">
                   <button class="btn btn-ghost btn-sm"
-                    @click="showModal=true; editData={{ json_encode(['id'=>$u->id,'name'=>$u->name,'email'=>$u->email,'role'=>$u->role,'department_id'=>$u->department_id ? (string)$u->department_id : '','is_active'=>$u->is_active ? '1' : '0']) }}">
+                    @click="showModal=true; editData={{ json_encode(['id'=>$u->id,'name'=>$u->name,'email'=>$u->email,'nip'=>$u->nip,'jabatan'=>$u->jabatan,'role'=>$u->role,'department_id'=>$u->department_id ? (string)$u->department_id : '','is_active'=>$u->is_active ? '1' : '0']) }}">
                     Edit
                   </button>
                   @if($u->id !== auth()->id())
@@ -131,6 +131,18 @@
                 <label>Email <span style="color:var(--danger)">*</span></label>
                 <input type="email" name="email" :value="editData.email||''" required>
               </div>
+
+              {{-- NIP & jabatan dipakai blok tanda tangan laporan PDF/Excel. --}}
+              <div class="field" style="margin:0">
+                <label>NIP</label>
+                <input type="text" name="nip" :value="editData.nip||''" placeholder="Untuk tanda tangan laporan">
+              </div>
+              <div class="field" style="margin:0">
+                <label>Jabatan</label>
+                <input type="text" name="jabatan" :value="editData.jabatan||''" placeholder="mis. Kepala Dinas Kominfo">
+                <span class="help">Kosong → memakai label peran.</span>
+              </div>
+
               <div class="field" style="margin:0">
                 <label>Role <span style="color:var(--danger)">*</span></label>
                 <x-searchable-select name="role" :options="$roles" x-model="editData.role"

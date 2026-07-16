@@ -52,6 +52,7 @@ class BarangMasukController extends Controller
             ['No. Transaksi', 'Tanggal', 'Supplier', 'Jenis Barang', 'Total Unit', 'Petugas'],
             $rows,
             'barang-masuk-' . now()->format('Ymd'),
+            withSignerSignature: $request->boolean('ttd'),
         );
 
         return $format === 'pdf'

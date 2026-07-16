@@ -25,6 +25,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'nip',
+        'jabatan',
         'password',
         'role',
         'department_id',
@@ -89,6 +91,16 @@ class User extends Authenticatable
             'pimpinan'       => 'Pimpinan',
             default          => $this->role,
         };
+    }
+
+    /**
+     * Jabatan untuk blok tanda tangan laporan. Jatuh ke label peran bila belum
+     * diisi agar dokumen tetap terbit — peran sistem memang bukan jabatan resmi,
+     * tapi itu lebih baik daripada baris jabatan yang kosong di bawah nama.
+     */
+    public function jabatanLabel(): string
+    {
+        return filled($this->jabatan) ? $this->jabatan : $this->roleLabel();
     }
 
     public function roleColor(): string
