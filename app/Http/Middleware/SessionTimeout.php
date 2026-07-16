@@ -16,6 +16,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SessionTimeout
 {
+    /**
+     * Rute yang dipanggil otomatis oleh halaman di latar belakang. Kehadirannya
+     * bukan tanda pengguna masih aktif, jadi tidak menyegarkan timer idle —
+     * tetap tunduk pada batas waktu, hanya tidak memperpanjangnya.
+     */
+    private const BACKGROUND_ROUTES = ['notifikasi.count'];
+
     public function handle(Request $request, Closure $next): Response
     {
         if (! Auth::check()) {
@@ -43,7 +50,9 @@ class SessionTimeout
             return redirect()->route('login', ['timeout' => 1]);
         }
 
-        $request->session()->put('last_activity_at', time());
+        if (! $request->routeIs(...self::BACKGROUND_ROUTES)) {
+            $request->session()->put('last_activity_at', time());
+        }
 
         return $next($request);
     }

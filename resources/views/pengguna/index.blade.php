@@ -13,7 +13,7 @@
     'pimpinan'       => 'Pimpinan',
   ];
 @endphp
-<div x-data="{ showModal: false, editData: {} }">
+<div x-data="{ showModal: false, editData: {}, showDetail: false, detailData: {} }">
 
   <div class="page-head" style="display:flex;align-items:center;justify-content:space-between">
     <div><h2>Manajemen Pengguna</h2><p>Kelola akun dan hak akses pengguna sistem.</p></div>
@@ -75,8 +75,30 @@
                   </span>
                 </td>
                 <td style="white-space:nowrap">
+                  {{-- Detail memuat data yang tidak muat di tabel: NIP, jabatan,
+                       dan status keamanan akun. --}}
                   <button class="btn btn-ghost btn-sm"
-                    @click="showModal=true; editData={{ json_encode(['id'=>$u->id,'name'=>$u->name,'email'=>$u->email,'role'=>$u->role,'department_id'=>$u->department_id ? (string)$u->department_id : '','is_active'=>$u->is_active ? '1' : '0']) }}">
+                    @click="showDetail=true; detailData={{ json_encode([
+                      'name'      => $u->name,
+                      'email'     => $u->email,
+                      'nip'       => $u->nip,
+                      'jabatan'   => $u->jabatan,
+                      'jabatanFallback' => $u->jabatanLabel(),
+                      'initials'  => $u->initials(),
+                      'roleLabel' => $u->roleLabel(),
+                      'roleColor' => $u->roleColor(),
+                      'dept'      => $u->department->name ?? null,
+                      'active'    => (bool) $u->is_active,
+                      'locked'    => $u->isLocked(),
+                      'lockedUntil' => $u->isLocked() ? $u->locked_until->isoFormat('D MMM YYYY, HH:mm') : null,
+                      'failed'    => (int) $u->failed_login_count,
+                      'joined'    => optional($u->created_at)->isoFormat('D MMMM YYYY'),
+                      'isSelf'    => $u->id === auth()->id(),
+                    ]) }}">
+                    Detail
+                  </button>
+                  <button class="btn btn-ghost btn-sm" style="margin-left:4px"
+                    @click="showModal=true; editData={{ json_encode(['id'=>$u->id,'name'=>$u->name,'email'=>$u->email,'nip'=>$u->nip,'jabatan'=>$u->jabatan,'role'=>$u->role,'department_id'=>$u->department_id ? (string)$u->department_id : '','is_active'=>$u->is_active ? '1' : '0']) }}">
                     Edit
                   </button>
                   @if($u->id !== auth()->id())
@@ -109,6 +131,80 @@
     </div>
   </div>
 
+  {{-- Detail: hanya baca. Isian yang tak muat di tabel, terutama NIP & jabatan
+       yang dipakai blok tanda tangan laporan. --}}
+  <template x-if="showDetail">
+    <div>
+      <div class="modal-overlay" style="display:block" @click="showDetail=false"></div>
+      <div class="modal" style="display:flex">
+        <div class="modal-head">
+          <h3>Detail Pengguna</h3>
+          <button class="close-btn" @click="showDetail=false">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+            <div style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:700;color:#fff;font-size:15px;flex:0 0 auto"
+                 :style="'background:' + detailData.roleColor" x-text="detailData.initials"></div>
+            <div style="min-width:0">
+              <div style="font-size:16px;font-weight:700" x-text="detailData.name"></div>
+              <div class="t-sub" style="font-family:var(--mono)" x-text="detailData.email"></div>
+            </div>
+            <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+              <span class="badge" :style="'background:' + detailData.roleColor + '1A;color:' + detailData.roleColor" x-text="detailData.roleLabel"></span>
+              <span class="badge" :class="detailData.active ? 'b-ok' : 'b-danger'" x-text="detailData.active ? 'Aktif' : 'Nonaktif'"></span>
+            </span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="field" style="margin:0">
+              <label>NIP</label>
+              <input type="text" :value="detailData.nip || '— belum diisi'" disabled>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Jabatan</label>
+              <input type="text" :value="detailData.jabatanFallback" disabled>
+              <span class="help" x-show="!detailData.jabatan" x-cloak>Belum diisi — memakai label peran.</span>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Bidang</label>
+              <input type="text" :value="detailData.dept || '—'" disabled>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Bergabung Sejak</label>
+              <input type="text" :value="detailData.joined || '—'" disabled>
+            </div>
+          </div>
+
+          {{-- Status keamanan hanya relevan bila memang ada masalah. --}}
+          <template x-if="detailData.locked || detailData.failed > 0">
+            <div class="notice warn" style="margin-top:16px">
+              <span class="ic">⚠</span>
+              <div>
+                <template x-if="detailData.locked">
+                  <div>Akun terkunci sampai <b x-text="detailData.lockedUntil"></b>.</div>
+                </template>
+                <div x-show="detailData.failed > 0">
+                  Percobaan login gagal: <b x-text="detailData.failed"></b>. Terhapus otomatis setelah login berhasil.
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template x-if="!detailData.nip">
+            <div class="notice warn" style="margin-top:12px">
+              <span class="ic">⚠</span>
+              <div>NIP kosong. Bila pengguna ini menandatangani laporan, NIP akan tercetak sebagai “-”.</div>
+            </div>
+          </template>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+            <button type="button" class="btn btn-ghost" @click="showDetail=false">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
   <template x-if="showModal">
     <div>
       <div class="modal-overlay" style="display:block" @click="showModal=false"></div>
@@ -131,6 +227,18 @@
                 <label>Email <span style="color:var(--danger)">*</span></label>
                 <input type="email" name="email" :value="editData.email||''" required>
               </div>
+
+              {{-- NIP & jabatan dipakai blok tanda tangan laporan PDF/Excel. --}}
+              <div class="field" style="margin:0">
+                <label>NIP</label>
+                <input type="text" name="nip" :value="editData.nip||''" placeholder="Untuk tanda tangan laporan">
+              </div>
+              <div class="field" style="margin:0">
+                <label>Jabatan</label>
+                <input type="text" name="jabatan" :value="editData.jabatan||''" placeholder="mis. Kepala Dinas Kominfo">
+                <span class="help">Kosong → memakai label peran.</span>
+              </div>
+
               <div class="field" style="margin:0">
                 <label>Role <span style="color:var(--danger)">*</span></label>
                 <x-searchable-select name="role" :options="$roles" x-model="editData.role"

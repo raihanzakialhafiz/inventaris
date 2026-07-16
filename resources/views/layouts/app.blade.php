@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/siatk.css') }}?v={{ filemtime(public_path('css/siatk.css')) }}">
   {{-- Alpine di-self-host (versi terkunci 3.15.0) — tanpa dependensi CDN --}}
-  <script defer src="{{ asset('js/vendor/alpine.min.js') }}"></script>
+  <script defer src="{{ asset('js/vendor/alpine.min.js') }}?v={{ filemtime(public_path('js/vendor/alpine.min.js')) }}"></script>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>

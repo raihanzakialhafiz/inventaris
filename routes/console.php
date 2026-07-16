@@ -1,15 +1,9 @@
 <?php
 
 use App\Models\Setting;
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
-
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
 
 // Jadwal reminder stok menipis — dapat diatur admin (Pengaturan Email):
 // setiap N hari pada jam H. Default: setiap hari jam 07:00.

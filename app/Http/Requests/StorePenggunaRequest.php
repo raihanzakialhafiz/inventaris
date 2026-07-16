@@ -17,6 +17,10 @@ class StorePenggunaRequest extends FormRequest
         return [
             'name'          => 'required|string|max:150',
             'email'         => 'required|email|unique:users,email',
+            // Sengaja tidak dipaksa 18 digit: format NIP berbeda antar status
+            // kepegawaian, dan tidak semua pengguna sistem punya NIP.
+            'nip'           => 'nullable|string|max:30',
+            'jabatan'       => 'nullable|string|max:150',
             // Kebijakan password seragam (sama dengan ganti password di Profil).
             'password'      => ['required', 'string', 'min:8', 'regex:/[a-zA-Z]/', 'regex:/[0-9]/'],
             'role'          => 'required|in:admin,kasubag_umum,petugas_gudang,kepala_bidang,pimpinan',

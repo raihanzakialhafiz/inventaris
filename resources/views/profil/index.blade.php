@@ -47,6 +47,10 @@
           <label>Role &amp; Bidang <span class="help">hanya dapat diubah oleh Administrator</span></label>
           <input type="text" value="{{ $user->roleLabel() }}{{ $user->department ? ' · '.$user->department->name : '' }}" disabled>
         </div>
+        <div class="field" style="margin:14px 0 0">
+          <label>NIP &amp; Jabatan <span class="help">dipakai tanda tangan laporan — hanya dapat diubah oleh Administrator</span></label>
+          <input type="text" value="{{ $user->nip ?: 'NIP belum diisi' }} · {{ $user->jabatanLabel() }}" disabled>
+        </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
           <button type="submit" class="btn btn-pri">Simpan Profil</button>
         </div>

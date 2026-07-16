@@ -44,6 +44,7 @@ class AuditLogController extends Controller
             ['Waktu', 'Pengguna', 'Aktivitas', 'Entitas', 'ID', 'Alamat IP'],
             $rows,
             'audit-log-' . now()->format('Ymd'),
+            withSignerSignature: $request->boolean('ttd'),
         );
 
         return $format === 'pdf'

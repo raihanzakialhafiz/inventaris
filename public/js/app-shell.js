@@ -1,13 +1,4 @@
-/**
- * Perilaku shell aplikasi (layout utama):
- *  - appShell(): state sidebar (mini/mobile) untuk Alpine
- *  - hotkey "/" fokus ke pencarian global
- *  - idle session timeout + keep-alive ping
- *  - page loading bar
- *
- * Konfigurasi dibaca dari window.__APP (disuntik layout):
- *   { idleMinutes: number, pingUrl: string }
- */
+
 function appShell() {
   const isMobile = () => window.innerWidth < 861;
   const saved    = localStorage.getItem('sb-mini');
@@ -85,11 +76,11 @@ document.addEventListener('keydown', function (e) {
     warning = false;
     if (modal) modal.hidden = true;
     clearInterval(countTimer);
-    keepAlive(true); // segarkan sesi server segera
+    keepAlive(true); 
     resetIdle();
   }
   function resetIdle() {
-    if (warning) return; // saat peringatan tampil, hanya tombol "Tetap Masuk" yang memperpanjang
+    if (warning) return; 
     clearTimeout(warnTimer);
     warnTimer = setTimeout(showWarning, Math.max(1000, IDLE_MS - WARN_MS));
     keepAlive();
@@ -102,7 +93,7 @@ document.addEventListener('keydown', function (e) {
   resetIdle();
 })();
 
-// Indikator kekuatan kata sandi — input dengan atribut [data-pw-meter].
+
 (function () {
   const LABELS = ['', 'Lemah', 'Cukup', 'Kuat', 'Sangat kuat'];
   const COLORS = ['#E2E8F0', '#DC2626', '#D97706', '#0D9488', '#0F766E'];
@@ -111,7 +102,7 @@ document.addEventListener('keydown', function (e) {
     if (!v) return 0;
     let s = 0;
     if (v.length >= 8) s++;
-    if (/[a-zA-Z]/.test(v) && /[0-9]/.test(v)) s++;              // kebijakan minimum sistem
+    if (/[a-zA-Z]/.test(v) && /[0-9]/.test(v)) s++;              
     if (v.length >= 12) s++;
     if (/[^a-zA-Z0-9]/.test(v) || (/[a-z]/.test(v) && /[A-Z]/.test(v))) s++;
     return s;
@@ -143,7 +134,10 @@ document.addEventListener('keydown', function (e) {
   const cfg = window.__APP || {};
   if (!cfg.notifCountUrl) return;
 
+  let lastRefresh = 0;
+
   async function refresh() {
+    lastRefresh = Date.now();
     try {
       const r = await fetch(cfg.notifCountUrl, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin',
@@ -162,7 +156,17 @@ document.addEventListener('keydown', function (e) {
     } catch (e) { /* offline — dicoba lagi interval berikutnya */ }
   }
 
-  setInterval(refresh, 60000);
+  // Tab tersembunyi tidak perlu badge yang segar — menghemat satu request per
+  // menit untuk tiap tab yang ditinggalkan terbuka.
+  setInterval(() => {
+    if (document.visibilityState === 'visible') refresh();
+  }, 60000);
+
+  // Segarkan begitu pengguna kembali ke tab, dengan jeda agar tidak beruntun
+  // saat tab dibolak-balik cepat.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - lastRefresh >= 60000) refresh();
+  });
 })();
 
 // Page loading bar
