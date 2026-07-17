@@ -39,3 +39,7 @@ Schedule::command('sampah:purge')->dailyAt('02:00')->runInBackground();
 
 // Backup database harian (retensi 14 hari) — lihat app/Console/Commands/BackupDatabase.
 Schedule::command('db:backup')->dailyAt('01:30')->runInBackground();
+
+// Pangkas audit log: event login/logout 90 hari, jejak perubahan data 2 tahun —
+// lihat app/Console/Commands/PruneAuditLog.
+Schedule::command('audit:prune')->dailyAt('02:15')->runInBackground();

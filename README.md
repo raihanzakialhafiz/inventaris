@@ -138,6 +138,7 @@ Jadwal bawaan:
 | `stock:check-minimum` | sesuai Pengaturan Email (default 07:00) | Notifikasi + email stok menipis |
 | `sampah:purge` | 02:00 | Hapus permanen isi Kotak Sampah > 30 hari |
 | `db:backup` | 01:30 | Backup database (retensi 14 hari) |
+| `audit:prune` | 02:15 | Pangkas audit log: login/logout > 90 hari, jejak perubahan > 2 tahun |
 
 Ketiganya juga bisa dijalankan manual, misalnya:
 
