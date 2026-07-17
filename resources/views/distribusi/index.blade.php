@@ -33,7 +33,7 @@
             @endforeach
           </tbody>
         </table>
-        @if($approved->hasPages())
+        @if($approved->total())
           <div class="pg-bar">
             <span class="pg-info">Menampilkan {{ $approved->firstItem() }}–{{ $approved->lastItem() }} dari {{ $approved->total() }} antrean</span>
             {{ $approved->links() }}

@@ -50,7 +50,7 @@
             @endforeach
           </tbody>
         </table>
-        @if($kuota->hasPages())
+        @if($kuota->total())
           <div class="pg-bar">
             <span class="pg-info">Menampilkan {{ $kuota->firstItem() }}–{{ $kuota->lastItem() }} dari {{ $kuota->total() }} kuota</span>
             {{ $kuota->links() }}

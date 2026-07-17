@@ -1,5 +1,7 @@
-@if ($paginator->hasPages())
-  @php
+{{-- Sengaja TANPA @if($paginator->hasPages()): saat data muat satu halaman,
+     nav tetap tampil («1» + panah nonaktif). Disembunyikan total membuat
+     pengguna mengira pagination rusak. --}}
+@php
     $current = $paginator->currentPage();
     $last    = $paginator->lastPage();
     $window  = 1; // jumlah nomor di kiri & kanan halaman aktif
@@ -44,4 +46,3 @@
       @endif
     </ul>
   </nav>
-@endif

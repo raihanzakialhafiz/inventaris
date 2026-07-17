@@ -52,7 +52,7 @@
           @endforelse
         </tbody>
       </table>
-      @if($kategori->hasPages())
+      @if($kategori->total())
         <div class="pg-bar">
           <span class="pg-info">Menampilkan {{ $kategori->firstItem() }}–{{ $kategori->lastItem() }} dari {{ $kategori->total() }} kategori</span>
           {{ $kategori->links() }}

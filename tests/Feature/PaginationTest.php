@@ -23,11 +23,17 @@ class PaginationTest extends TestCase
         $res->assertSee('page=2', false);          // ada tautan ke halaman 2
     }
 
-    public function test_tidak_ada_pagination_saat_data_sedikit(): void
+    /**
+     * Pagination SELALU tampil, juga saat data muat satu halaman — «1» dengan
+     * panah nonaktif. Dulu disembunyikan total dan pengguna mengira rusak.
+     */
+    public function test_pagination_tetap_tampil_saat_data_sedikit(): void
     {
         $admin = $this->makeUser('admin');
         Category::create(['name' => 'Satu', 'description' => '-']);
 
-        $this->actingAs($admin)->get('/kategori')->assertDontSee('page=2', false);
+        $res = $this->actingAs($admin)->get('/kategori');
+        $res->assertSee('class="pagination"', false);
+        $res->assertDontSee('page=2', false); // tetap tak ada tautan halaman 2
     }
 }

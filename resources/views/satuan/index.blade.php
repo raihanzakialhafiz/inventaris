@@ -46,7 +46,7 @@
             @endforeach
           </tbody>
         </table>
-        @if($satuan->hasPages())
+        @if($satuan->total())
           <div class="pg-bar">
             <span class="pg-info">Menampilkan {{ $satuan->firstItem() }}–{{ $satuan->lastItem() }} dari {{ $satuan->total() }} satuan</span>
             {{ $satuan->links() }}

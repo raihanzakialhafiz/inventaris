@@ -52,7 +52,7 @@
       </div>
     @endforelse
     </div>
-    @if($quotaItems->hasPages())
+    @if($quotaItems->total())
       <div class="pg-bar">
         <span class="pg-info">Menampilkan {{ $quotaItems->firstItem() }}–{{ $quotaItems->lastItem() }} dari {{ $quotaItems->total() }} barang</span>
         {{ $quotaItems->links() }}

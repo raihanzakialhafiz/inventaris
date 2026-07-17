@@ -70,7 +70,7 @@
       </div>
     @endforelse
   </div>
-  @if($notifications->hasPages())
+  @if($notifications->total())
     <div class="pg-bar">
       <span class="pg-info">Menampilkan {{ $notifications->firstItem() }}–{{ $notifications->lastItem() }} dari {{ $notifications->total() }} notifikasi</span>
       {{ $notifications->links() }}

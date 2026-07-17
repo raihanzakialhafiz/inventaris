@@ -60,7 +60,7 @@
           @endforeach
         </tbody>
       </table>
-      @if($rows->hasPages())
+      @if($rows->total())
         <div class="pg-bar">
           <span class="pg-info">Menampilkan {{ $rows->firstItem() }}–{{ $rows->lastItem() }} dari {{ $rows->total() }} data</span>
           {{ $rows->links() }}

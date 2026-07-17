@@ -50,7 +50,7 @@
           @endforelse
         </tbody>
       </table>
-      @if($bidang->hasPages())
+      @if($bidang->total())
         <div class="pg-bar">
           <span class="pg-info">Menampilkan {{ $bidang->firstItem() }}–{{ $bidang->lastItem() }} dari {{ $bidang->total() }} bidang</span>
           {{ $bidang->links() }}
