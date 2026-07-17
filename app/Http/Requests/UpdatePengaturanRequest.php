@@ -23,7 +23,6 @@ class UpdatePengaturanRequest extends FormRequest
             'address'          => 'nullable|string|max:255',
             'footer_text'      => 'nullable|string|max:255',
             'contact_email'    => 'nullable|email|max:100',
-            'contact_phone'    => 'nullable|string|max:40',
             'session_timeout'  => 'required|integer|min:1|max:1440',
             // Pejabat penanda tangan laporan. Sengaja merujuk pengguna (bukan nama
             // bebas) agar nama/NIP/jabatan ikut berubah saat data pengguna diperbarui.

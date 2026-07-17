@@ -8,8 +8,8 @@
 <div class="page-head" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
   <div><h2>Audit Log Sistem</h2><p>Rekaman seluruh aktivitas pengguna dalam sistem.</p></div>
   <div style="display:flex;gap:8px;flex:0 0 auto">
-    <a href="{{ route('audit-log.export', ['format' => 'pdf'] + request()->query()) }}" class="btn btn-ghost btn-sm"><x-icon name="printer" width="14" height="14" /> PDF</a>
-    <a href="{{ route('audit-log.export', ['format' => 'excel'] + request()->query()) }}" class="btn btn-ghost btn-sm"><x-icon name="download" width="14" height="14" /> Excel</a>
+    <x-export-ttd :pdf="route('audit-log.export', ['format' => 'pdf'] + request()->query())"
+                  :excel="route('audit-log.export', ['format' => 'excel'] + request()->query())" />
   </div>
 </div>
 

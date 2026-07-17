@@ -32,8 +32,8 @@
   <div class="page-head" style="display:flex;align-items:center;justify-content:space-between">
     <div><h2>Barang Masuk</h2><p>Pencatatan penerimaan barang dari supplier.</p></div>
     <div style="display:flex;gap:8px;align-items:center">
-      <a href="{{ route('barang-masuk.export', ['format' => 'pdf'] + request()->query()) }}" class="btn btn-ghost btn-sm"><x-icon name="printer" width="14" height="14" /> PDF</a>
-      <a href="{{ route('barang-masuk.export', ['format' => 'excel'] + request()->query()) }}" class="btn btn-ghost btn-sm"><x-icon name="download" width="14" height="14" /> Excel</a>
+      <x-export-ttd :pdf="route('barang-masuk.export', ['format' => 'pdf'] + request()->query())"
+                    :excel="route('barang-masuk.export', ['format' => 'excel'] + request()->query())" />
       <button class="btn btn-pri" @click="openModal()"><x-icon name="plus" width="15" height="15" /> Input Barang Masuk</button>
     </div>
   </div>

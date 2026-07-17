@@ -69,4 +69,40 @@ class PenggunaTest extends TestCase
 
         $this->assertFalse($lain->fresh()->is_active);
     }
+
+    /**
+     * Regresi: NIP & jabatan sempat divalidasi tapi dibuang controller (tidak
+     * masuk daftar field yang disimpan). Uji lewat HTTP, bukan model langsung —
+     * lewat model, bug seperti ini tidak terdeteksi.
+     */
+    public function test_nip_dan_jabatan_tersimpan_lewat_form_tambah(): void
+    {
+        $this->actingAs($this->admin)->post('/pengguna', [
+            'name'      => 'Pegawai Baru',
+            'email'     => 'baru@siatk.test',
+            'nip'       => '199001012015031001',
+            'jabatan'   => 'Pengelola Barang',
+            'password'  => 'rahasia123',
+            'role'      => 'petugas_gudang',
+            'is_active' => 1,
+        ])->assertSessionHas('success');
+
+        $baru = User::where('email', 'baru@siatk.test')->first();
+        $this->assertSame('199001012015031001', $baru->nip);
+        $this->assertSame('Pengelola Barang', $baru->jabatan);
+    }
+
+    public function test_nip_dan_jabatan_tersimpan_lewat_form_edit(): void
+    {
+        $lain = $this->makeUser('pimpinan');
+
+        $this->actingAs($this->admin)
+            ->put("/pengguna/{$lain->id}", $this->payload($lain, [
+                'nip' => '198203152006041002', 'jabatan' => 'Kepala Dinas',
+            ]))->assertSessionHas('success');
+
+        $lain->refresh();
+        $this->assertSame('198203152006041002', $lain->nip);
+        $this->assertSame('Kepala Dinas', $lain->jabatan);
+    }
 }

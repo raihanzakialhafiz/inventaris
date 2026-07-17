@@ -31,18 +31,8 @@
 
   @php $exportParams = ['type'=>$type, 'period'=>$period, 'dept'=>$deptId]; @endphp
   <span class="filter-spacer"></span>
-  {{-- Tombol ekspor berupa tautan, jadi parameter ttd disisipkan ke URL-nya. --}}
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"
-       x-data='{ ttd: false, pdf: @json(route('laporan.export.pdf', $exportParams)), xls: @json(route('laporan.export.excel', $exportParams)) }'>
-    {{-- Checkbox hanya berguna bila pejabat penanda tangan sudah diatur. --}}
-    @if(setting('signer_user_id'))
-      <label style="display:flex;gap:6px;align-items:center;font-size:13px;white-space:nowrap;cursor:pointer">
-        <input type="checkbox" x-model="ttd"> Sertakan tanda tangan pimpinan
-      </label>
-    @endif
-    <a :href="pdf + (ttd ? '&ttd=1' : '')" class="btn btn-ghost btn-sm"><x-icon name="download" width="14" height="14" /> PDF</a>
-    <a :href="xls + (ttd ? '&ttd=1' : '')" class="btn btn-ghost btn-sm"><x-icon name="download" width="14" height="14" /> Excel</a>
-  </div>
+  <x-export-ttd :pdf="route('laporan.export.pdf', $exportParams)"
+                :excel="route('laporan.export.excel', $exportParams)" />
 </div>
 
 {{-- ===== STOK ===== --}}

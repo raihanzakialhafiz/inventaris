@@ -57,11 +57,7 @@
   .kp-i { font-size: 15px; font-weight: 700; }
   .kp-a { font-size: 8.5px; }
   .kp-judul { text-align: center; font-size: 12px; font-weight: 700; margin: 12px 0 0; }
-  .save-bar {
-    position: sticky; bottom: 0; margin-top: 22px; padding: 14px 0;
-    background: linear-gradient(to top, var(--surface) 60%, transparent);
-    display: flex; justify-content: flex-end; gap: 10px;
-  }
+  /* .save-bar didefinisikan di siatk.css — dipakai bersama Pengaturan Email. */
   /* Layar sempit: nav jadi baris ikon yang bisa digeser mendatar. */
   @media (max-width: 900px) {
     .set-wrap { grid-template-columns: 1fr; }
@@ -78,7 +74,7 @@
     'ttd'       => ['Penanda Tangan', 'scroll'],
     'logo'      => ['Logo & Favicon', 'image'],
     'login'     => ['Halaman Login', 'user'],
-    'kontak'    => ['Kontak & Footer', 'mail'],
+    'kontak'    => ['Footer', 'file-text'],
     'keamanan'  => ['Keamanan Sesi', 'shield'],
   ];
 @endphp
@@ -106,11 +102,15 @@
     <div class="notice warn" style="margin-bottom:16px"><span class="ic">⚠</span><div>{{ $errors->first() }}</div></div>
   @endif
 
-  {{-- Isian wajib yang tersembunyi tidak bisa difokuskan browser: form akan
-       menolak submit TANPA pesan apa pun. Pindah ke tab yang bermasalah dulu
-       agar pesan validasinya terlihat. --}}
+  {{-- Isian wajib yang tersembunyi tidak bisa difokuskan browser: form menolak
+       submit TANPA pesan apa pun. Pindah dulu ke tab yang bermasalah, lalu
+       reportValidity SETELAH tab-nya tampil ($nextTick) supaya gelembung pesan
+       browser benar-benar muncul — tanpa itu pengguna harus klik Simpan dua
+       kali. Guard k !== tab mencegah loop: reportValidity memicu invalid lagi,
+       tapi saat itu tab sudah benar. --}}
   <form method="POST" action="{{ route('pengaturan.update') }}" enctype="multipart/form-data"
-        @invalid.capture="tab = $event.target.closest('[data-tab]')?.dataset.tab ?? tab">
+        @invalid.capture="const t = $event.target, k = t.closest('[data-tab]')?.dataset.tab;
+                          if (k && k !== tab) { tab = k; $nextTick(() => t.reportValidity()); }">
     @csrf
     @method('PUT')
 
@@ -265,23 +265,17 @@
       </div>
     </div>
 
-    {{-- Kontak & Footer — Email Kontak dipindah ke bagian Kop Surat karena
-         ia baris ke-4 kop, bukan sekadar informasi kontak. --}}
+    {{-- Footer — Email Kontak pindah ke Kop Surat (baris ke-4 kop), dan
+         Telepon Kontak dihapus: tidak pernah dirender di output mana pun. --}}
     <div class="card set-card" data-tab="kontak" x-show="tab === 'kontak'" x-cloak>
       <div class="card-h">
-        <h3>Kontak &amp; Footer</h3>
-        <p>Telepon instansi dan teks footer yang tampil di kaki laporan.</p>
+        <h3>Footer Laporan</h3>
+        <p>Teks yang tampil di kaki setiap laporan PDF.</p>
       </div>
       <div class="card-b">
-        <div class="set-grid">
-          <div class="field" style="margin:0">
-            <label>Telepon Kontak</label>
-            <input type="text" name="contact_phone" value="{{ old('contact_phone', $settings['contact_phone'] ?? '') }}">
-          </div>
-          <div class="field" style="margin:0">
-            <label>Teks Footer</label>
-            <input type="text" name="footer_text" value="{{ old('footer_text', $settings['footer_text'] ?? '') }}">
-          </div>
+        <div class="field" style="margin:0;max-width:460px">
+          <label>Teks Footer</label>
+          <input type="text" name="footer_text" value="{{ old('footer_text', $settings['footer_text'] ?? '') }}">
         </div>
       </div>
     </div>

@@ -18,7 +18,6 @@ class PengaturanController extends Controller
         'address'          => 'text',
         'footer_text'      => 'text',
         'contact_email'    => 'email',
-        'contact_phone'    => 'phone',
         'session_timeout'  => 'number',
         'signer_user_id'   => 'number',
         'signature_place'  => 'text',

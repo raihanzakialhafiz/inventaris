@@ -415,6 +415,25 @@ a { color: var(--primary-dark); }
 .card-h .hint{ color: var(--muted); font-size: 12px; margin-left: auto; }
 .card-b { padding: 19px; }
 
+/* Kepala kartu pengaturan: ikon + judul + deskripsi (dipakai halaman
+   Pengaturan Sistem & Pengaturan Email — jangan didefinisikan per halaman). */
+.mc-h { display: flex; align-items: flex-start; gap: 12px; }
+.mc-ic {
+  width: 34px; height: 34px; border-radius: 9px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background: var(--primary-soft); color: var(--primary-dark);
+}
+.mc-h h3 { margin-bottom: 3px; }
+.mc-h p  { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
+.mc-side { margin-left: auto; flex: 0 0 auto; font-size: 12px; color: var(--muted); text-align: right; }
+
+/* Bilah simpan lengket di kaki form pengaturan. */
+.save-bar {
+  position: sticky; bottom: 0; margin-top: 18px; padding: 14px 0;
+  background: linear-gradient(to top, var(--surface) 60%, transparent);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
 .grid { display: grid; gap: 16px; }
 .g-4  { grid-template-columns: repeat(4, 1fr); }
 .g-2  { grid-template-columns: 1fr 1fr; }

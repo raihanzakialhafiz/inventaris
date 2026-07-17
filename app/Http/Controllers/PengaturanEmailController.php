@@ -34,10 +34,16 @@ class PengaturanEmailController extends Controller
         // salah satu kosong = jatuh ke .env, yang belum tentu diisi.
         $configured = $hasPassword && filled($settings['mail_from_address'] ?? config('mail.from.address'));
 
-        // Ditulis penjadwal tiap kali email stok menipis terkirim.
-        $lastSent = filled($settings['stock_alert_last_sent'] ?? null)
-            ? Carbon::parse($settings['stock_alert_last_sent'])
-            : null;
+        // Ditulis penjadwal tiap kali email stok menipis terkirim. Nilai rusak
+        // (edit manual di DB) tidak boleh mematikan halaman ini — tanpa halaman
+        // ini, admin justru kehilangan satu-satunya tempat memperbaikinya.
+        $lastSent = rescue(
+            fn () => filled($settings['stock_alert_last_sent'] ?? null)
+                ? Carbon::parse($settings['stock_alert_last_sent'])
+                : null,
+            rescue: null,
+            report: false,
+        );
 
         return view('pengaturan-email.index', compact('settings', 'hasPassword', 'configured', 'lastSent'));
     }

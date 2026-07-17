@@ -18,7 +18,6 @@ class SettingSeeder extends Seeder
             ['key' => 'address',          'value' => 'Jl. Contoh No. 1, Kota',        'type' => 'text'],
             ['key' => 'footer_text',      'value' => '© 2026 Sistem Inventaris ATK',  'type' => 'text'],
             ['key' => 'contact_email',    'value' => 'info@instansi.go.id',           'type' => 'email'],
-            ['key' => 'contact_phone',    'value' => '(021) 000-0000',                'type' => 'phone'],
             ['key' => 'session_timeout',  'value' => '30',                            'type' => 'number'],
         ];
 

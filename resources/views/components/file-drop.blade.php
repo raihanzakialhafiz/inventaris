@@ -38,8 +38,7 @@
          if (this.pratinjau) URL.revokeObjectURL(this.pratinjau);
          this.pratinjau = '';
        },
-     }"
-     x-on:reset.window="batal()">
+     }">
 
   <input type="file" name="{{ $name }}" accept="{{ $accept }}" x-ref="inp" class="fdrop-inp"
          @change="ambil($event.target.files)">

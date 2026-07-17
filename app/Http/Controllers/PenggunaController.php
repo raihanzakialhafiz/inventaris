@@ -41,6 +41,8 @@ class PenggunaController extends Controller
         User::create([
             'name'          => $request->name,
             'email'         => $request->email,
+            'nip'           => $request->nip,
+            'jabatan'       => $request->jabatan,
             'password'      => Hash::make($request->password),
             'role'          => $request->role,
             'department_id' => $request->department_id,
@@ -52,7 +54,7 @@ class PenggunaController extends Controller
 
     public function update(UpdatePenggunaRequest $request, User $pengguna)
     {
-        $data = $request->safe()->only('name', 'email', 'role', 'department_id');
+        $data = $request->safe()->only('name', 'email', 'nip', 'jabatan', 'role', 'department_id');
         $data['is_active'] = $request->boolean('is_active', true);
 
         // Jangan sampai admin mengunci dirinya sendiri dari sistem.

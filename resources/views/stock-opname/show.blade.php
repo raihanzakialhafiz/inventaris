@@ -9,7 +9,7 @@
     <div class="card-h">
       <h3>Detail Stock Opname</h3>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <a href="{{ route('stock-opname.export', $opname) }}" class="btn btn-ghost btn-sm"><x-icon name="printer" width="14" height="14" /> Cetak PDF</a>
+        <x-export-ttd :pdf="route('stock-opname.export', $opname)" pdf-label="Cetak PDF" />
         <a href="{{ route('stock-opname.index') }}" class="btn btn-ghost btn-sm">← Kembali</a>
       </div>
     </div>

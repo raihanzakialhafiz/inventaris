@@ -10,17 +10,9 @@
 @endphp
 
 <style>
+  {{-- .mc-h/.mc-ic/.mc-side dan .save-bar didefinisikan di siatk.css —
+       dipakai bersama halaman Pengaturan Sistem. --}}
   .mail-wrap { max-width: 760px; }
-  /* Kepala kartu berikon — seirama dengan kartu di Pengaturan Sistem. */
-  .mc-h { display: flex; align-items: flex-start; gap: 12px; }
-  .mc-ic {
-    width: 34px; height: 34px; border-radius: 9px; flex: 0 0 auto;
-    display: grid; place-items: center;
-    background: var(--primary-soft); color: var(--primary-dark);
-  }
-  .mc-h h3 { margin-bottom: 3px; }
-  .mc-h p  { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
-  .mc-side { margin-left: auto; flex: 0 0 auto; font-size: 12px; color: var(--muted); text-align: right; }
   /* Panduan App Password: panel yang membuka ke bawah, bukan popover melayang.
      Popover sebelumnya tertimpa kartu berikutnya — .card menjalankan animasi
      fadeUp (transform) sehingga tiap kartu jadi stacking context dan z-index
@@ -38,11 +30,6 @@
     font-size: 12.5px; line-height: 1.6; color: var(--ink);
   }
   .guide ol { margin: 6px 0 0; padding-left: 18px; }
-  .save-bar {
-    position: sticky; bottom: 0; margin-top: 18px; padding: 14px 0;
-    background: linear-gradient(to top, var(--surface) 60%, transparent);
-    display: flex; justify-content: flex-end;
-  }
   @media (max-width: 720px) { .mail-grid { grid-template-columns: 1fr !important; } }
 </style>
 
