@@ -30,7 +30,15 @@ class DistribusiController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('distribusi.index', compact('approved', 'history'));
+        // Ringkasan sekilas-pandang di atas halaman.
+        $stats = [
+            'hariIni'   => StockOut::where('type', 'request')->whereDate('date', today())->count(),
+            'unitBulan' => (int) StockOut::where('type', 'request')
+                ->whereYear('date', now()->year)->whereMonth('date', now()->month)
+                ->sum('quantity'),
+        ];
+
+        return view('distribusi.index', compact('approved', 'history', 'stats'));
     }
 
     public function store(Request $request, ItemRequest $permintaan)

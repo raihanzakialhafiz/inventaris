@@ -13,32 +13,63 @@
     <p>Proses permintaan yang sudah disetujui, lalu pantau riwayat barang keluar.</p>
   </div>
 
+  {{-- Ringkasan sekilas-pandang: beban kerja & aktivitas tanpa harus membaca tabel. --}}
+  <div class="grid g-3" style="margin-bottom:16px">
+    <div class="stat {{ $approved->total() > 0 ? 'warn' : 'ok' }}">
+      <div class="accent"></div>
+      <div class="lbl">Menunggu Diproses</div>
+      <div class="val">{{ $approved->total() }} <small>permintaan</small></div>
+    </div>
+    <div class="stat">
+      <div class="accent"></div>
+      <div class="lbl">Distribusi Hari Ini</div>
+      <div class="val">{{ $stats['hariIni'] }} <small>transaksi</small></div>
+    </div>
+    <div class="stat">
+      <div class="accent"></div>
+      <div class="lbl">Unit Keluar Bulan Ini</div>
+      <div class="val">{{ number_format($stats['unitBulan'], 0, ',', '.') }} <small>unit</small></div>
+    </div>
+  </div>
+
   @if($approved->total() > 0)
     <div class="card" style="margin-bottom:16px">
       <div class="card-h mc-h">
         <span class="mc-ic"><x-icon name="send-up" width="17" height="17" /></span>
         <div>
           <h3>Antrean Distribusi</h3>
-          <p>Permintaan disetujui yang menunggu diserahkan ke bidang.</p>
+          <p>Cek kolom <b>Kesiapan Stok</b> dulu — permintaan berstok kurang tetap bisa diproses dengan mengurangi jumlah &amp; mengisi alasan.</p>
         </div>
-        <span class="mc-side"><b style="color:var(--ink)">{{ $approved->total() }}</b><br>siap diproses</span>
       </div>
       <div class="card-b" style="padding:0">
         <table>
           <thead><tr>
             <th class="num">No</th>
             <th>No. Permintaan</th><th>Bidang</th><th>Pengaju</th>
-            <th class="num">Jenis Barang</th><th>Disetujui</th><th>Aksi</th>
+            <th class="num">Barang</th><th>Kesiapan Stok</th><th>Disetujui</th><th>Aksi</th>
           </tr></thead>
           <tbody>
             @foreach($approved as $req)
+              @php
+                // Dihitung dari relasi yang sudah dimuat — tanpa query tambahan.
+                $kurang = $req->details->filter(
+                  fn ($d) => $d->item->stock < ($d->quantity_approved ?? 0)
+                )->count();
+              @endphp
               <tr>
                 <td class="num t-sub">{{ $approved->firstItem() + $loop->index }}</td>
                 <td><span class="code">{{ $req->request_no }}</span></td>
                 <td><span class="badge b-primary">{{ $req->department->code }}</span> {{ $req->department->name }}</td>
                 <td class="t-sub">{{ $req->requester->name }}</td>
-                <td class="num">{{ $req->details->count() }}</td>
-                <td>{{ $req->approved_date?->isoFormat('D MMM Y') }}</td>
+                <td class="num">{{ $req->details->count() }} jenis</td>
+                <td>
+                  @if($kurang)
+                    <span class="badge b-warn">⚠ {{ $kurang }} barang kurang</span>
+                  @else
+                    <span class="badge b-ok">✓ Semua siap</span>
+                  @endif
+                </td>
+                <td class="t-sub">{{ $req->approved_date?->isoFormat('D MMM Y') }}</td>
                 <td><button type="button" class="btn btn-pri btn-sm" @click="openId = {{ $req->id }}">Proses →</button></td>
               </tr>
             @endforeach
@@ -55,7 +86,7 @@
   @else
     <div class="notice info" style="margin-bottom:16px">
       <span class="ic">✓</span>
-      <div>Tidak ada permintaan yang menunggu distribusi.</div>
+      <div><b>Semua beres.</b> Tidak ada permintaan yang menunggu distribusi — antrean baru muncul di sini setelah Kasubag menyetujui permintaan.</div>
     </div>
   @endif
 
