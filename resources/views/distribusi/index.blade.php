@@ -8,21 +8,32 @@
      Nilai awal dari ?proses agar tautan dari halaman lain langsung membuka modal. --}}
 <div x-data="{ openId: {{ request('proses') ? (int) request('proses') : 'null' }} }">
 
+  <div class="page-head">
+    <h2>Distribusi Barang</h2>
+    <p>Proses permintaan yang sudah disetujui, lalu pantau riwayat barang keluar.</p>
+  </div>
+
   @if($approved->total() > 0)
     <div class="card" style="margin-bottom:16px">
-      <div class="card-h">
-        <h3>Antrean Distribusi</h3>
-        <span class="hint">{{ $approved->total() }} permintaan siap didistribusikan</span>
+      <div class="card-h mc-h">
+        <span class="mc-ic"><x-icon name="send-up" width="17" height="17" /></span>
+        <div>
+          <h3>Antrean Distribusi</h3>
+          <p>Permintaan disetujui yang menunggu diserahkan ke bidang.</p>
+        </div>
+        <span class="mc-side"><b style="color:var(--ink)">{{ $approved->total() }}</b><br>siap diproses</span>
       </div>
       <div class="card-b" style="padding:0">
         <table>
           <thead><tr>
+            <th class="num">No</th>
             <th>No. Permintaan</th><th>Bidang</th><th>Pengaju</th>
             <th class="num">Jenis Barang</th><th>Disetujui</th><th>Aksi</th>
           </tr></thead>
           <tbody>
             @foreach($approved as $req)
               <tr>
+                <td class="num t-sub">{{ $approved->firstItem() + $loop->index }}</td>
                 <td><span class="code">{{ $req->request_no }}</span></td>
                 <td><span class="badge b-primary">{{ $req->department->code }}</span> {{ $req->department->name }}</td>
                 <td class="t-sub">{{ $req->requester->name }}</td>
@@ -49,17 +60,25 @@
   @endif
 
   <div class="card">
-    <div class="card-h"><h3>Riwayat Distribusi Terbaru</h3></div>
+    <div class="card-h mc-h">
+      <span class="mc-ic"><x-icon name="clipboard" width="17" height="17" /></span>
+      <div>
+        <h3>Riwayat Distribusi Terbaru</h3>
+        <p>Barang keluar yang sudah diserahkan, berikut rujukan permintaannya.</p>
+      </div>
+    </div>
     <div class="card-b" style="padding:0">
       @if($history->count())
         <table>
           <thead><tr>
+            <th class="num">No</th>
             <th>No. Transaksi</th><th>Barang</th><th>Bidang</th>
             <th class="num">Jml</th><th>Tanggal</th><th>Ref. Permintaan</th>
           </tr></thead>
           <tbody>
             @foreach($history as $so)
               <tr>
+                <td class="num t-sub">{{ $history->firstItem() + $loop->index }}</td>
                 <td><span class="code">{{ $so->transaction_no }}</span></td>
                 <td>{{ $so->item->name }}</td>
                 <td><span class="badge b-primary">{{ $so->department->code ?? '—' }}</span></td>
