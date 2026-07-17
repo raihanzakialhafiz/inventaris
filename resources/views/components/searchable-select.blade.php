@@ -69,7 +69,17 @@
      @resize.window="open && position()"
      {{ $attributes }}>
 
-    <input type="hidden" name="{{ $name }}" :value="value" @if($required) required @endif>
+    {{-- Saat required, JANGAN type="hidden": input hidden dikecualikan dari
+         validasi browser sehingga `required` tak pernah dicek — form lolos
+         kosong ke server tanpa pesan apa pun. Input teks yang disembunyikan
+         visual (bukan display:none) tetap ikut constraint validation, dan
+         gelembung pesannya muncul menempel komponen ini. --}}
+    @if($required)
+      <input type="text" name="{{ $name }}" :value="value" required tabindex="-1" aria-hidden="true"
+             style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+    @else
+      <input type="hidden" name="{{ $name }}" :value="value">
+    @endif
 
     <button type="button" class="ss-btn" x-ref="btn" @click="toggle()" :class="{ 'ss-open': open }">
         <span x-text="label || @js($placeholder)" :class="{ 'ss-ph': !label }"></span>

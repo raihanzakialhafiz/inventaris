@@ -578,6 +578,8 @@ tbody tr:hover { background: rgba(13,148,136,.05) !important; cursor: default; }
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px; }
 .field .help { color: var(--muted); font-weight: 400; font-size: 11.5px; margin-top: 3px; display: block; }
+/* Pesan validasi inline di bawah isian — pengganti toast untuk error form. */
+.field .err  { color: var(--danger); font-weight: 600; font-size: 11.5px; margin-top: 3px; display: block; }
 input[type=text],
 input[type=number],
 input[type=email],

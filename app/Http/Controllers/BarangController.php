@@ -41,7 +41,24 @@ class BarangController extends Controller
         // Satuan sbg pilihan dropdown (value=label=nama, karena items.unit menyimpan nama).
         $units      = Unit::orderBy('name')->pluck('name', 'name');
 
-        return view('barang.index', compact('items', 'categories', 'units'));
+        return view('barang.index', compact('items', 'categories', 'units') + ['nextCode' => $this->nextCode()]);
+    }
+
+    /**
+     * Saran kode berikutnya untuk form Tambah: ATK-<nomor terbesar + 1>.
+     * Termasuk barang di Kotak Sampah (withTrashed) — kodenya masih terpakai
+     * dan akan bentrok bila dipulihkan. Sekadar saran: tetap bisa diubah, dan
+     * keunikannya tetap dijaga validasi server.
+     */
+    private function nextCode(): string
+    {
+        $max = Item::withTrashed()
+            ->where('code', 'like', 'ATK-%')
+            ->pluck('code')
+            ->map(fn ($c) => preg_match('/^ATK-(\d+)$/', $c, $m) ? (int) $m[1] : 0)
+            ->max() ?? 0;
+
+        return 'ATK-' . str_pad($max + 1, 3, '0', STR_PAD_LEFT);
     }
 
     public function store(StoreBarangRequest $request)
