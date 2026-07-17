@@ -33,14 +33,14 @@
                     @click="showModal=true; editData={{ json_encode(['id'=>$s->id,'name'=>$s->name,'description'=>$s->description]) }}">
                     Edit
                   </button>
-                  @if($s->items_using === 0)
-                    <form method="POST" action="{{ route('satuan.destroy', $s) }}" style="display:inline"
-                          data-confirm="Hapus satuan {{ $s->name }}?"
-                          data-confirm-variant="danger" data-confirm-ok="Hapus">
-                      @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
-                    </form>
-                  @endif
+                  {{-- Tombol selalu tampil; satuan yang masih dipakai barang
+                       ditolak server dengan pesan jelas (SatuanController). --}}
+                  <form method="POST" action="{{ route('satuan.destroy', $s) }}" style="display:inline"
+                        data-confirm="Hapus satuan {{ $s->name }}?{{ $s->items_using > 0 ? ' Satuan ini masih dipakai '.$s->items_using.' barang dan hanya bisa dihapus setelah tidak terpakai.' : '' }}"
+                        data-confirm-variant="danger" data-confirm-ok="Hapus">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
+                  </form>
                 </td>
               </tr>
             @endforeach

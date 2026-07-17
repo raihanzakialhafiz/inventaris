@@ -29,14 +29,14 @@
                   @click="showModal=true; editData={{ json_encode(['id'=>$b->id,'code'=>$b->code,'name'=>$b->name,'head_user_id'=>$b->head_user_id,'description'=>$b->description]) }}">
                   Edit
                 </button>
-                @if($b->users_count === 0)
-                  <form method="POST" action="{{ route('bidang.destroy', $b) }}" style="display:inline"
-                        data-confirm="Hapus bidang {{ $b->name }}?"
-                        data-confirm-variant="danger" data-confirm-ok="Hapus">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
-                  </form>
-                @endif
+                {{-- Tombol selalu tampil; bidang yang masih punya pegawai atau
+                     permintaan ditolak server dengan pesan jelas (BidangController). --}}
+                <form method="POST" action="{{ route('bidang.destroy', $b) }}" style="display:inline"
+                      data-confirm="Hapus bidang {{ $b->name }}?{{ $b->users_count > 0 ? ' Bidang ini masih punya '.$b->users_count.' pegawai dan hanya bisa dihapus setelah kosong.' : '' }}"
+                      data-confirm-variant="danger" data-confirm-ok="Hapus">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
+                </form>
               </td>
             </tr>
           @empty

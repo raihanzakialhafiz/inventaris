@@ -3,6 +3,14 @@
     'options' => [10, 25, 50, 100],
 ])
 
+@php
+    // Nilai per-halaman yang benar-benar dipakai HARUS ada di daftar opsi. Bila
+    // tidak (mis. default 15/20 sementara opsi 10/25/50/100), tak ada <option>
+    // yang selected → browser menampilkan opsi pertama (10), sehingga "Tampilkan
+    // N" tak cocok dengan jumlah baris yang tampil dan pagination terlihat rusak.
+    $options = collect($options)->push((int) $perPage)->unique()->sort()->values()->all();
+@endphp
+
 {{-- Selektor "Tampilkan N data" untuk diletakkan di dalam pagination bar (kiri-bawah).
      Form mini yang mempertahankan seluruh query string aktif (search/filter/sort). --}}
 <form method="GET" class="per-page">

@@ -31,14 +31,14 @@
                   @click="openModal({{ $kat->id }}, '{{ addslashes($kat->name) }}', '{{ addslashes($kat->description) }}')">
                   Edit
                 </button>
-                @if($kat->items_count === 0)
-                  <form method="POST" action="{{ route('kategori.destroy', $kat) }}" style="display:inline"
-                        data-confirm="Hapus kategori {{ $kat->name }}?"
-                        data-confirm-variant="danger" data-confirm-ok="Hapus">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
-                  </form>
-                @endif
+                {{-- Tombol selalu tampil; kategori yang masih berisi barang
+                     ditolak server dengan pesan jelas (lihat KategoriController). --}}
+                <form method="POST" action="{{ route('kategori.destroy', $kat) }}" style="display:inline"
+                      data-confirm="Hapus kategori {{ $kat->name }}?{{ $kat->items_count > 0 ? ' Kategori ini masih berisi '.$kat->items_count.' barang dan hanya bisa dihapus setelah kosong.' : '' }}"
+                      data-confirm-variant="danger" data-confirm-ok="Hapus">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
+                </form>
               </td>
             </tr>
           @empty
