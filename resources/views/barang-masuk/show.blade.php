@@ -23,7 +23,7 @@
 
       <table>
         <thead><tr>
-          <th>Barang</th><th>Satuan</th><th class="num">Jumlah</th>
+          <th>Barang</th><th>Satuan</th><th class="num">Jumlah</th><th>Aksi</th>
         </tr></thead>
         <tbody>
           @foreach($stockIn->details as $d)
@@ -31,6 +31,16 @@
               <td><span class="code">{{ $d->item->code }}</span> {{ $d->item->name }}</td>
               <td>{{ $d->item->unit }}</td>
               <td class="num"><b>{{ $d->quantity }}</b></td>
+              <td>
+                {{-- Koreksi salah input sebagian: hapus baris ini saja, stok
+                     barangnya dikembalikan. Baris terakhir menghapus transaksi. --}}
+                <form method="POST" action="{{ route('barang-masuk.destroy-detail', [$stockIn, $d]) }}"
+                      data-confirm="Hapus {{ $d->item->name }} ({{ $d->quantity }} {{ $d->item->unit }}) dari transaksi ini? Stoknya akan dikurangi kembali.{{ $stockIn->details->count() === 1 ? ' Ini baris terakhir — transaksinya ikut terhapus.' : '' }}"
+                      data-confirm-variant="danger" data-confirm-ok="Hapus">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                </form>
+              </td>
             </tr>
           @endforeach
         </tbody>
@@ -38,6 +48,7 @@
           <tr>
             <th colspan="2" style="text-align:right;padding:11px 14px">Total Unit Diterima</th>
             <th class="num" style="padding:11px 14px">{{ $stockIn->totalQuantity() }}</th>
+            <th></th>
           </tr>
         </tfoot>
       </table>

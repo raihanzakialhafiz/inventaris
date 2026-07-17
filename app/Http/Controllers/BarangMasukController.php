@@ -123,4 +123,109 @@ class BarangMasukController extends Controller
 
         return redirect()->route('barang-masuk.index')->with('success', 'Barang masuk berhasil dicatat, stok diperbarui.');
     }
+
+    /**
+     * Hapus satu transaksi barang masuk utuh (koreksi salah input).
+     * Stok setiap barangnya dikembalikan (dikurangi lagi). Ditolak bila ada
+     * barang yang stoknya sudah terpakai — mengurangi paksa membuat stok minus
+     * dan riwayat distribusi jadi tidak masuk akal.
+     */
+    public function destroy(StockIn $barangMasuk)
+    {
+        $barangMasuk->load('details.item');
+
+        try {
+            DB::transaction(function () use ($barangMasuk) {
+                // Validasi SEMUA baris dulu dengan baris barang terkunci —
+                // jangan sampai sebagian stok sudah dikurangi lalu gagal di tengah.
+                foreach ($barangMasuk->details as $d) {
+                    $item = Item::whereKey($d->item_id)->lockForUpdate()->first();
+                    if (! $item || $item->stock < $d->quantity) {
+                        throw new \RuntimeException(
+                            'Stok ' . ($item->name ?? 'barang') . ' sudah terpakai (' .
+                            ($item?->stock ?? 0) . ' tersisa, transaksi ini menyumbang ' . $d->quantity . ').'
+                        );
+                    }
+                }
+
+                foreach ($barangMasuk->details as $d) {
+                    Item::whereKey($d->item_id)->decrement('stock', $d->quantity);
+                }
+
+                AuditLog::create([
+                    'user_id'     => auth()->id(),
+                    'activity'    => 'delete_stock_in',
+                    'entity_type' => 'stock_ins',
+                    'entity_id'   => $barangMasuk->id,
+                    'old_values'  => [
+                        'no'    => $barangMasuk->transaction_no,
+                        'items' => $barangMasuk->details->map(fn ($d) => [
+                            'item_id' => $d->item_id, 'qty' => $d->quantity,
+                        ])->all(),
+                    ],
+                    'ip_address'  => request()->ip(),
+                ]);
+
+                $barangMasuk->details()->delete();
+                $barangMasuk->delete();
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', 'Transaksi tidak dapat dihapus: ' . $e->getMessage());
+        }
+
+        return redirect()->route('barang-masuk.index')
+            ->with('success', "Transaksi {$barangMasuk->transaction_no} dihapus, stok dikembalikan.");
+    }
+
+    /**
+     * Hapus SATU baris barang dari transaksi (salah input sebagian).
+     * Bila itu baris terakhir, transaksinya ikut terhapus — header tanpa
+     * isi tidak berarti apa-apa.
+     */
+    public function destroyDetail(StockIn $barangMasuk, StockInDetail $detail)
+    {
+        abort_unless($detail->stock_in_id === $barangMasuk->id, 404);
+
+        try {
+            DB::transaction(function () use ($barangMasuk, $detail) {
+                $item = Item::whereKey($detail->item_id)->lockForUpdate()->first();
+                if (! $item || $item->stock < $detail->quantity) {
+                    throw new \RuntimeException(
+                        'Stok ' . ($item->name ?? 'barang') . ' sudah terpakai (' .
+                        ($item?->stock ?? 0) . ' tersisa, baris ini menyumbang ' . $detail->quantity . ').'
+                    );
+                }
+
+                $item->decrement('stock', $detail->quantity);
+
+                AuditLog::create([
+                    'user_id'     => auth()->id(),
+                    'activity'    => 'delete_stock_in_detail',
+                    'entity_type' => 'stock_ins',
+                    'entity_id'   => $barangMasuk->id,
+                    'old_values'  => [
+                        'no' => $barangMasuk->transaction_no,
+                        'item_id' => $detail->item_id, 'qty' => $detail->quantity,
+                    ],
+                    'ip_address'  => request()->ip(),
+                ]);
+
+                $detail->delete();
+
+                if (! $barangMasuk->details()->exists()) {
+                    $barangMasuk->delete();
+                }
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', 'Baris tidak dapat dihapus: ' . $e->getMessage());
+        }
+
+        // Transaksi bisa ikut terhapus bila barusan baris terakhir.
+        if (! StockIn::whereKey($barangMasuk->id)->exists()) {
+            return redirect()->route('barang-masuk.index')
+                ->with('success', "Baris terakhir dihapus — transaksi {$barangMasuk->transaction_no} ikut dihapus, stok dikembalikan.");
+        }
+
+        return back()->with('success', 'Baris barang dihapus, stok dikembalikan.');
+    }
 }

@@ -81,10 +81,20 @@
                 <td class="num t-sub">{{ $si->details->count() }} jenis</td>
                 <td class="num"><b>{{ $si->totalQuantity() }}</b></td>
                 <td class="t-sub">{{ $si->createdBy->name }}</td>
-                <td>
+                <td style="white-space:nowrap">
                   <button type="button" class="icon-act" title="Lihat detail" @click="detailId = {{ $si->id }}">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
+                  {{-- Hapus transaksi utuh: stok seluruh barangnya dikembalikan.
+                       Hapus per-baris tersedia di halaman detail. --}}
+                  <form method="POST" action="{{ route('barang-masuk.destroy', $si) }}" style="display:inline"
+                        data-confirm="Hapus transaksi {{ $si->transaction_no }}? Stok semua barang di dalamnya akan dikurangi kembali."
+                        data-confirm-variant="danger" data-confirm-ok="Hapus">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="icon-act" title="Hapus transaksi" style="color:var(--danger)">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    </button>
+                  </form>
                 </td>
               </tr>
             @endforeach

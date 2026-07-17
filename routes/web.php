@@ -112,7 +112,9 @@ Route::middleware('auth')->group(function () {
         // Rute ekspor didaftarkan sebelum resource agar tidak tertelan wildcard {id}.
         Route::get('/barang-masuk/export/{format}', [BarangMasukController::class, 'export'])->name('barang-masuk.export');
         Route::get('/stock-opname/{stock_opname}/export', [StockOpnameController::class, 'export'])->name('stock-opname.export');
-        Route::resource('barang-masuk', BarangMasukController::class)->only(['index', 'store', 'show']);
+        // Hapus per-baris didaftarkan sebelum resource agar tidak tertelan wildcard.
+        Route::delete('/barang-masuk/{barang_masuk}/detail/{detail}', [BarangMasukController::class, 'destroyDetail'])->name('barang-masuk.destroy-detail');
+        Route::resource('barang-masuk', BarangMasukController::class)->only(['index', 'store', 'show', 'destroy']);
         Route::resource('stock-opname', StockOpnameController::class)->only(['index', 'store', 'show']);
     });
 
