@@ -3,15 +3,20 @@
 
 @section('content')
 @php
-  // [label, kelas-badge, warna aksen, ikon] per jenis notifikasi.
+  // [label, kelas-badge, nada warna, nama ikon] per jenis notifikasi.
+  //
+  // Ikon diambil dari <x-icon> — bukan emoji. Emoji dirender oleh sistem
+  // operasi, jadi tampilannya berbeda di tiap perangkat dan goresannya tidak
+  // pernah cocok dengan set ikon garis yang dipakai seluruh aplikasi.
+  // Warna dibawa oleh nada semantik (tone-*), bukan hex lepas per baris.
   $typeMeta = [
-    'new_request'         => ['Permintaan Baru',      'b-primary', '#0D9488', '✉'],
-    'request_approved'    => ['Permintaan Disetujui', 'b-ok',      '#16A34A', '✓'],
-    'ready_to_distribute' => ['Siap Distribusi',      'b-primary', '#2563EB', '↑'],
-    'request_rejected'    => ['Permintaan Ditolak',   'b-danger',  '#DC2626', '✕'],
-    'request_distributed' => ['Distribusi Selesai',   'b-ok',      '#0D9488', '📦'],
-    'low_stock'           => ['Stok Menipis',         'b-warn',    '#EA580C', '📉'],
-    'reorder'             => ['Perlu Restok',         'b-warn',    '#CA8A04', '🛒'],
+    'new_request'         => ['Permintaan Baru',      'b-primary', 'primary', 'mail'],
+    'request_approved'    => ['Permintaan Disetujui', 'b-ok',      'ok',      'check-circle'],
+    'ready_to_distribute' => ['Siap Distribusi',      'b-primary', 'primary', 'send-up'],
+    'request_rejected'    => ['Permintaan Ditolak',   'b-danger',  'danger',  'x'],
+    'request_distributed' => ['Distribusi Selesai',   'b-ok',      'ok',      'box'],
+    'low_stock'           => ['Stok Menipis',         'b-warn',    'warn',    'trending-down'],
+    'reorder'             => ['Perlu Restok',         'b-warn',    'warn',    'truck'],
   ];
 @endphp
 
@@ -21,7 +26,7 @@
     @if($notifications->where('is_read', false)->count())
       <form method="POST" action="{{ route('notifikasi.readAll') }}">
         @csrf
-        <button type="submit" class="btn btn-ghost btn-sm">✓ Tandai semua dibaca</button>
+        <button type="submit" class="btn btn-ghost btn-sm"><x-icon name="check" width="13" height="13" /> Tandai semua dibaca</button>
       </form>
     @endif
     @if($notifications->total())
@@ -38,10 +43,12 @@
 <div class="card">
   <div class="card-b" style="padding:6px 0">
     @forelse($notifications as $n)
-      @php $meta = $typeMeta[$n->type] ?? [ucfirst(str_replace('_',' ',$n->type)), 'b-neutral', '#64748B', '•']; @endphp
-      <div class="notif-row {{ $n->is_read ? '' : 'unread' }}" style="border-left:3px solid {{ $meta[2] }}">
+      @php $meta = $typeMeta[$n->type] ?? [ucfirst(str_replace('_',' ',$n->type)), 'b-neutral', 'neutral', 'dot']; @endphp
+      {{-- Tanpa garis tebal di tepi kiri: jenis notifikasi sudah dibawa oleh
+           warna lingkaran ikon DAN oleh badge bertuliskan namanya. --}}
+      <div class="notif-row {{ $n->is_read ? '' : 'unread' }}">
         <a href="{{ route('notifikasi.read', $n) }}" class="notif-row-main">
-          <span class="notif-ic" style="background:{{ $meta[2] }}1a;color:{{ $meta[2] }}">{{ $meta[3] }}</span>
+          <span class="notif-ic tone-{{ $meta[2] }}"><x-icon :name="$meta[3]" /></span>
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <span class="badge {{ $meta[1] }}">{{ $meta[0] }}</span>
@@ -57,14 +64,14 @@
                 data-confirm-variant="danger" data-confirm-ok="Hapus">
             @csrf @method('DELETE')
             <button type="submit" class="icon-act danger" title="Hapus notifikasi">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              <x-icon name="trash" width="16" height="16" />
             </button>
           </form>
         </div>
       </div>
     @empty
       <div class="empty">
-        <div class="empty-ic">🔔</div>
+        <div class="empty-ic"><x-icon name="bell" /></div>
         <b>Belum ada notifikasi</b>
         <p>Pemberitahuan aktivitas akan muncul di sini.</p>
       </div>

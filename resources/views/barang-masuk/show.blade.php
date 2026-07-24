@@ -8,7 +8,7 @@
   <div class="card">
     <div class="card-h">
       <h3>Detail Barang Masuk</h3>
-      <a href="{{ route('barang-masuk.index') }}" class="btn btn-ghost btn-sm" style="margin-left:auto">← Kembali</a>
+      <a href="{{ route('barang-masuk.index') }}" class="btn btn-ghost btn-sm" style="margin-left:auto"><x-icon name="arrow-left" width="13" height="13" style="vertical-align:-2px" /> Kembali</a>
     </div>
     <div class="card-b">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">

@@ -32,7 +32,7 @@
                 {{-- Tombol selalu tampil; bidang yang masih punya pegawai atau
                      permintaan ditolak server dengan pesan jelas (BidangController). --}}
                 <form method="POST" action="{{ route('bidang.destroy', $b) }}" style="display:inline"
-                      data-confirm="Hapus bidang {{ $b->name }}?{{ $b->users_count > 0 ? ' Bidang ini masih punya '.$b->users_count.' pegawai dan hanya bisa dihapus setelah kosong.' : '' }}"
+                      data-confirm="Hapus bidang {{ $b->name }}?{{ $b->users_count > 0 ? ' Bidang ini masih punya '.$b->users_count.' pegawai dan hanya bisa dihapus setelah kosong.' : ' Bisa dipulihkan dari Sampah.' }}"
                       data-confirm-variant="danger" data-confirm-ok="Hapus">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
@@ -42,7 +42,7 @@
           @empty
             <tr><td colspan="5">
               <div class="empty">
-                <div class="empty-ic">⊞</div>
+                <div class="empty-ic"><x-icon name="building" /></div>
                 <b>Belum ada bidang</b>
                 <p>Tambah unit kerja untuk mengelompokkan permintaan dan kuota.</p>
               </div>
@@ -65,7 +65,7 @@
       <div class="modal" style="display:flex">
         <div class="modal-head">
           <h3 x-text="editData.id ? 'Edit Bidang' : 'Tambah Bidang'"></h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form :action="editData.id ? '/bidang/'+editData.id : '/bidang'" method="POST">

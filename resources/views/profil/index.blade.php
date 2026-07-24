@@ -11,7 +11,7 @@
   {{-- Ringkasan identitas --}}
   <div class="card" style="margin-bottom:18px">
     <div class="card-b" style="display:flex;align-items:center;gap:16px">
-      <span class="role-ava lg" style="background:{{ $user->roleColor() }};width:60px;height:60px;border-radius:16px;font-size:20px;flex:0 0 auto;color:#fff;display:grid;place-items:center;font-weight:700">
+      <span class="role-ava lg" style="background:{{ $user->roleColor() }};width:60px;height:60px;border-radius:16px;font-size:20px;flex:0 0 auto;color:var(--on-accent);display:grid;place-items:center;font-weight:700">
         {{ $user->initials() }}
       </span>
       <div style="min-width:0">

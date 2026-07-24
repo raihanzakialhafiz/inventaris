@@ -15,7 +15,7 @@
 @endphp
 
 @if($n === 0 || $maxVal < 1)
-  <div class="empty" style="padding:26px 0"><div class="ic">▁▃▅</div><b>Belum ada data untuk ditampilkan</b></div>
+  <div class="empty" style="padding:26px 0"><div class="empty-ic"><x-icon name="bar-chart" /></div><b>Belum ada data untuk ditampilkan</b></div>
 @else
   @php
     // Skala "nice": bulatkan puncak ke 1/2/2.5/5/10 × 10^k agar tick enak dibaca.

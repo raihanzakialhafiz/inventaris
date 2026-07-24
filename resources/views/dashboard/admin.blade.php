@@ -8,7 +8,6 @@
 {{-- Stat Cards --}}
 <div class="grid g-4">
   <div class="stat {{ ($lowStock->count() + $outStock->count()) > 0 ? 'warn' : 'ok' }}">
-    <div class="accent"></div>
     <div class="lbl">Stok Perlu Perhatian</div>
     <div class="val">{{ $lowStock->count() + $outStock->count() }}</div>
     <div class="tag badge {{ ($lowStock->count() + $outStock->count()) > 0 ? 'b-warn' : 'b-ok' }}">
@@ -16,19 +15,16 @@
     </div>
   </div>
   <div class="stat {{ $pending > 0 ? 'danger' : 'ok' }}">
-    <div class="accent"></div>
     <div class="lbl">Permintaan Pending</div>
     <div class="val">{{ $pending }}</div>
     <div class="tag badge {{ $pending > 0 ? 'b-danger' : 'b-ok' }}">menunggu Kasubag</div>
   </div>
   <div class="stat">
-    <div class="accent"></div>
     <div class="lbl">Total Jenis Barang</div>
     <div class="val">{{ $items->count() }}</div>
     <div class="tag badge b-neutral">{{ $items->where('stock', '>', 0)->count() }} aktif</div>
   </div>
   <div class="stat {{ $stockInCount > 0 ? 'ok' : '' }}">
-    <div class="accent"></div>
     <div class="lbl">Penerimaan Bulan Ini</div>
     <div class="val">{{ $stockInCount }}</div>
     <div class="tag badge b-ok">transaksi masuk</div>
@@ -38,10 +34,10 @@
 {{-- Alert Over-Request --}}
 @if($overReqs > 0)
   <div class="notice warn mt">
-    <span class="ic">⚠</span>
+    <span class="ic"><x-icon name="alert" /></span>
     <div>
       <b>{{ $overReqs }} permintaan over-request</b> menunggu persetujuan Kasubag.
-      <a href="{{ route('permintaan.index') }}" style="margin-left:8px;font-weight:600">Lihat semua →</a>
+      <a href="{{ route('permintaan.index') }}" style="margin-left:8px;font-weight:600">Lihat semua <x-icon name="arrow-right" width="13" height="13" style="vertical-align:-2px" /></a>
     </div>
   </div>
 @endif
@@ -90,7 +86,7 @@
         </div>
       @empty
         <div class="empty" style="padding:32px 0">
-          <div class="ic" style="font-size:24px">✓</div>
+          <div class="empty-ic"><x-icon name="check" /></div>
           <b>Semua stok aman</b>
           <p class="t-sub" style="margin-top:4px">Tidak ada barang kritis saat ini</p>
         </div>
@@ -111,7 +107,7 @@
             <a href="{{ route('permintaan.show', $req) }}" class="code">{{ $req->request_no }}</a>
             <span class="badge b-primary">{{ $req->department->code }}</span>
             <x-status-badge :status="$req->status" />
-            @if($req->is_flagged)<span class="badge b-danger" style="font-size:10px">⚠ Over</span>@endif
+            @if($req->is_flagged)<span class="badge b-danger" style="font-size:10px"><x-icon name="alert" width="11" height="11" style="vertical-align:-1px" /> Over</span>@endif
           </div>
           <div class="t-sub" style="margin-top:3px">
             {{ $req->requester->name }} · {{ $req->request_date->isoFormat('D MMM Y') }}
@@ -119,7 +115,7 @@
         </div>
       @endforeach
       @if($recentReqs->isEmpty())
-        <div class="empty" style="padding:24px 0"><div class="ic">☷</div><b>Belum ada permintaan</b></div>
+        <div class="empty" style="padding:24px 0"><div class="empty-ic"><x-icon name="rows" /></div><b>Belum ada permintaan</b></div>
       @endif
     </div>
   </div>
@@ -163,7 +159,7 @@
             </td>
           </tr>
         @empty
-          <tr><td colspan="6"><div class="empty"><div class="ic">☷</div><b>Belum ada data bidang</b></div></td></tr>
+          <tr><td colspan="6"><div class="empty"><div class="empty-ic"><x-icon name="rows" /></div><b>Belum ada data bidang</b></div></td></tr>
         @endforelse
       </tbody>
     </table>

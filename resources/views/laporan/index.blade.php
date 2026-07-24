@@ -90,7 +90,7 @@
           </tbody>
         </table>
       @else
-        <div class="empty"><div class="ic">↓</div><b>Tidak ada data</b></div>
+        <div class="empty"><div class="empty-ic"><x-icon name="inbox-in" /></div><b>Tidak ada data</b></div>
       @endif
     </div>
   </div>
@@ -121,7 +121,7 @@
           </tbody>
         </table>
       @else
-        <div class="empty"><div class="ic">↑</div><b>Tidak ada data</b></div>
+        <div class="empty"><div class="empty-ic"><x-icon name="send-up" /></div><b>Tidak ada data</b></div>
       @endif
     </div>
   </div>
@@ -146,13 +146,13 @@
                 <td class="t-sub">{{ $req->requester->name }}</td>
                 <td>{{ $req->request_date->isoFormat('D MMM Y') }}</td>
                 <td><x-status-badge :status="$req->status" /></td>
-                <td>@if($req->is_flagged)<span class="badge b-danger">⚠</span>@else<span class="t-sub">—</span>@endif</td>
+                <td>@if($req->is_flagged)<span class="badge b-danger"><x-icon name="alert" width="12" height="12" /></span>@else<span class="t-sub">—</span>@endif</td>
               </tr>
             @endforeach
           </tbody>
         </table>
       @else
-        <div class="empty"><div class="ic">✉</div><b>Tidak ada data</b></div>
+        <div class="empty"><div class="empty-ic"><x-icon name="file-text" /></div><b>Tidak ada data</b></div>
       @endif
     </div>
   </div>

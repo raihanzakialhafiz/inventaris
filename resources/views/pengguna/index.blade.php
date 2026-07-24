@@ -36,7 +36,7 @@
     <span class="filter-spacer"></span>
 
     @if(request()->hasAny(['search','role']))
-      <a href="{{ route('pengguna.index') }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+      <a href="{{ route('pengguna.index') }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
     @endif
   </form>
 
@@ -57,7 +57,7 @@
               <tr>
                 <td>
                   <div style="display:flex;align-items:center;gap:10px">
-                    <div style="width:30px;height:30px;border-radius:8px;background:{{ $u->roleColor() }};display:grid;place-items:center;font-weight:700;color:#fff;font-size:11px;flex:0 0 auto">{{ $u->initials() }}</div>
+                    <div style="width:30px;height:30px;border-radius:8px;background:{{ $u->roleColor() }};display:grid;place-items:center;font-weight:700;color:var(--on-accent);font-size:11px;flex:0 0 auto">{{ $u->initials() }}</div>
                     <div>
                       <div class="t-name">{{ $u->name }}</div>
                       @if($u->isLocked())<div style="font-size:11px;color:var(--danger)">Terkunci</div>@endif
@@ -123,7 +123,7 @@
         </div>
       @else
         <div class="empty">
-          <div class="empty-ic">◯</div>
+          <div class="empty-ic"><x-icon name="users" /></div>
           <b>Tidak ada pengguna ditemukan</b>
           <p>Coba ubah kata kunci pencarian atau filter role.</p>
         </div>
@@ -139,11 +139,11 @@
       <div class="modal" style="display:flex">
         <div class="modal-head">
           <h3>Detail Pengguna</h3>
-          <button class="close-btn" @click="showDetail=false">✕</button>
+          <button class="close-btn" @click="showDetail=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
-            <div style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:700;color:#fff;font-size:15px;flex:0 0 auto"
+            <div style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:700;color:var(--on-accent);font-size:15px;flex:0 0 auto"
                  :style="'background:' + detailData.roleColor" x-text="detailData.initials"></div>
             <div style="min-width:0">
               <div style="font-size:16px;font-weight:700" x-text="detailData.name"></div>
@@ -178,7 +178,7 @@
           {{-- Status keamanan hanya relevan bila memang ada masalah. --}}
           <template x-if="detailData.locked || detailData.failed > 0">
             <div class="notice warn" style="margin-top:16px">
-              <span class="ic">⚠</span>
+              <span class="ic"><x-icon name="alert" /></span>
               <div>
                 <template x-if="detailData.locked">
                   <div>Akun terkunci sampai <b x-text="detailData.lockedUntil"></b>.</div>
@@ -192,7 +192,7 @@
 
           <template x-if="!detailData.nip">
             <div class="notice warn" style="margin-top:12px">
-              <span class="ic">⚠</span>
+              <span class="ic"><x-icon name="alert" /></span>
               <div>NIP kosong. Bila pengguna ini menandatangani laporan, NIP akan tercetak sebagai “-”.</div>
             </div>
           </template>
@@ -211,7 +211,7 @@
       <div class="modal" style="display:flex">
         <div class="modal-head">
           <h3 x-text="editData.id ? 'Edit Pengguna' : 'Tambah Pengguna'"></h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form :action="editData.id ? '/pengguna/'+editData.id : '/pengguna'" method="POST"

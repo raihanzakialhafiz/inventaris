@@ -35,7 +35,7 @@
   <span class="filter-spacer"></span>
 
   @if(request()->anyFilled(['q','user_id','entity_type','date']))
-    <a href="{{ route('audit-log.index') }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+    <a href="{{ route('audit-log.index') }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
   @endif
 </form>
 
@@ -113,7 +113,7 @@
       </div>
     @else
       <div class="empty">
-        <div class="empty-ic">≡</div>
+        <div class="empty-ic"><x-icon name="scroll" /></div>
         <b>Tidak ada log yang ditemukan</b>
         <p>Coba ubah kata kunci pencarian atau filter untuk melihat data lain.</p>
       </div>

@@ -34,7 +34,7 @@
                 {{-- Tombol selalu tampil; kategori yang masih berisi barang
                      ditolak server dengan pesan jelas (lihat KategoriController). --}}
                 <form method="POST" action="{{ route('kategori.destroy', $kat) }}" style="display:inline"
-                      data-confirm="Hapus kategori {{ $kat->name }}?{{ $kat->items_count > 0 ? ' Kategori ini masih berisi '.$kat->items_count.' barang dan hanya bisa dihapus setelah kosong.' : '' }}"
+                      data-confirm="Hapus kategori {{ $kat->name }}?{{ $kat->items_count > 0 ? ' Kategori ini masih berisi '.$kat->items_count.' barang dan hanya bisa dihapus setelah kosong.' : ' Bisa dipulihkan dari Sampah.' }}"
                       data-confirm-variant="danger" data-confirm-ok="Hapus">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
@@ -44,7 +44,7 @@
           @empty
             <tr><td colspan="5">
               <div class="empty">
-                <div class="empty-ic">⊟</div>
+                <div class="empty-ic"><x-icon name="tag" /></div>
                 <b>Belum ada kategori</b>
                 <p>Tambah kategori untuk mengelompokkan barang ATK.</p>
               </div>
@@ -68,7 +68,7 @@
       <div class="modal" style="display:flex">
         <div class="modal-head">
           <h3 x-text="editId ? 'Edit Kategori' : 'Tambah Kategori'"></h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form :action="editId ? '/kategori/'+editId : '/kategori'" method="POST">

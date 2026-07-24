@@ -22,7 +22,7 @@
            placeholder="Cari barang, permintaan, pengguna, supplier…">
     <button type="submit" class="btn btn-pri btn-sm">Cari</button>
     @if($q !== '')
-      <a href="{{ route('search.index') }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+      <a href="{{ route('search.index') }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
     @endif
   </form>
 
@@ -44,7 +44,7 @@
         @endforeach
       </div>
       @if(!empty($group['allUrl']))
-        <a href="{{ $group['allUrl'] }}" class="notif-foot" style="display:block">Lihat semua di {{ $group['label'] }} →</a>
+        <a href="{{ $group['allUrl'] }}" class="notif-foot" style="display:block">Lihat semua di {{ $group['label'] }} <x-icon name="arrow-right" width="13" height="13" style="vertical-align:-2px" /></a>
       @endif
     </div>
   @empty

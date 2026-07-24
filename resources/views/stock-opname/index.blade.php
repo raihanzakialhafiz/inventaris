@@ -35,7 +35,7 @@
                 </td>
                 <td class="t-sub">{{ $o->createdBy->name ?? '—' }}</td>
                 <td>
-                  <a href="{{ route('stock-opname.show', $o) }}" class="btn btn-ghost btn-sm">Detail →</a>
+                  <a href="{{ route('stock-opname.show', $o) }}" class="btn btn-ghost btn-sm">Detail <x-icon name="arrow-right" width="13" height="13" style="vertical-align:-2px" /></a>
                 </td>
               </tr>
             @endforeach
@@ -47,7 +47,7 @@
         </div>
       @else
         <div class="empty">
-          <div class="empty-ic">🧮</div>
+          <div class="empty-ic"><x-icon name="clipboard" /></div>
           <b>Belum ada stock opname</b>
           <p>Mulai opname untuk mencocokkan stok fisik dengan sistem.</p>
         </div>
@@ -62,7 +62,7 @@
       <div class="modal" style="display:flex;max-width:780px">
         <div class="modal-head">
           <h3>Mulai Stock Opname</h3>
-          <button type="button" class="close-btn" @click="showModal=false">✕</button>
+          <button type="button" class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <p class="t-sub" style="margin-bottom:12px">Isi jumlah <b>fisik</b> hasil hitungan. Stok sistem otomatis disesuaikan bila berbeda.</p>

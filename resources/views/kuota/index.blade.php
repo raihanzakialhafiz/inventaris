@@ -58,7 +58,7 @@
         @endif
       @else
         <div class="empty">
-          <div class="empty-ic">◎</div>
+          <div class="empty-ic"><x-icon name="target" /></div>
           <b>Belum ada kuota yang dikonfigurasi</b>
           <p>Tambah kuota untuk mengatur batas permintaan per bidang.</p>
         </div>
@@ -72,7 +72,7 @@
       <div class="modal" style="display:flex">
         <div class="modal-head">
           <h3 x-text="editData.id ? 'Edit Kuota' : 'Tambah Kuota'"></h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form :action="editData.id ? '/kuota/'+editData.id : '/kuota'" method="POST">

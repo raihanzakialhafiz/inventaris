@@ -14,10 +14,11 @@
        dipakai bersama halaman Pengaturan Sistem. --}}
   .mail-wrap { max-width: 760px; }
   /* Panduan App Password: panel yang membuka ke bawah, bukan popover melayang.
-     Popover sebelumnya tertimpa kartu berikutnya — .card menjalankan animasi
-     fadeUp (transform) sehingga tiap kartu jadi stacking context dan z-index
-     popover terkurung di dalam kartunya sendiri. Panel inline tidak bisa
-     tertimpa sama sekali. */
+     Popover sebelumnya tertimpa kartu berikutnya — dulu .card menjalankan
+     animasi fadeUp (transform) sehingga tiap kartu jadi stacking context dan
+     z-index popover terkurung di dalam kartunya sendiri. Animasi itu sudah
+     dihapus, tapi panel inline tetap dipertahankan: ia tidak bisa tertimpa
+     sama sekali, tanpa bergantung pada urutan lapisan. */
   .guide-btn {
     display: inline-flex; align-items: center; gap: 5px; border: 0; background: none;
     padding: 0; cursor: pointer; color: var(--primary-dark);
@@ -49,7 +50,7 @@
 
   @unless($configured)
     <div class="notice warn" style="margin-bottom:16px">
-      <span class="ic">⚠</span>
+      <span class="ic"><x-icon name="alert" /></span>
       <div>Email sistem belum bisa terkirim. Isi <b>Email Pengirim</b> dan <b>App Password</b> di bawah, simpan, lalu kirim email uji.</div>
     </div>
   @endunless
@@ -155,7 +156,7 @@
       {{-- Perubahan belum disimpan → uji memakai nilai lama dan kegagalannya
            menyesatkan. Peringatkan, jangan biarkan pengguna tertipu. --}}
       <div class="notice warn" style="margin:0 0 12px" x-show="dirty" x-cloak>
-        <span class="ic">⚠</span>
+        <span class="ic"><x-icon name="alert" /></span>
         <div>Ada perubahan yang belum disimpan. Klik <b>Simpan Pengaturan Email</b> dulu — jika tidak, email uji masih memakai konfigurasi lama.</div>
       </div>
 
@@ -165,7 +166,7 @@
           <label>Kirim ke Email</label>
           <input type="email" name="test_email" value="{{ auth()->user()->email }}" required placeholder="tujuan@email.com">
         </div>
-        <button type="submit" class="btn btn-ghost">✉ Kirim Email Uji</button>
+        <button type="submit" class="btn btn-ghost"><x-icon name="mail" width="14" height="14" /> Kirim Email Uji</button>
       </form>
     </div>
   </div>

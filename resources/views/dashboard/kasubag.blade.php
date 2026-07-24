@@ -8,7 +8,6 @@
 {{-- Stat Cards --}}
 <div class="grid g-4">
   <div class="stat {{ $pending->count() > 0 ? 'danger' : 'ok' }}">
-    <div class="accent"></div>
     <div class="lbl">Menunggu Persetujuan</div>
     <div class="val">{{ $pending->count() }}</div>
     <div class="tag badge {{ $pending->count() > 0 ? 'b-danger' : 'b-ok' }}">
@@ -16,7 +15,6 @@
     </div>
   </div>
   <div class="stat {{ $flagged > 0 ? 'warn' : 'ok' }}">
-    <div class="accent"></div>
     <div class="lbl">Over-Request</div>
     <div class="val">{{ $flagged }}</div>
     <div class="tag badge {{ $flagged > 0 ? 'b-warn' : 'b-ok' }}">
@@ -24,13 +22,11 @@
     </div>
   </div>
   <div class="stat">
-    <div class="accent"></div>
     <div class="lbl">Total Bidang</div>
     <div class="val">{{ $deptSummary->count() }}</div>
     <div class="tag badge b-neutral">unit kerja aktif</div>
   </div>
   <div class="stat ok">
-    <div class="accent"></div>
     <div class="lbl">Diproses Bulan Ini</div>
     <div class="val">{{ $recentApproved->count() }}</div>
     <div class="tag badge b-ok">selesai diproses</div>
@@ -40,16 +36,16 @@
 {{-- Pemberitahuan ringkas (tanpa tabel) — detail ada di menu Permintaan --}}
 @if($pending->count() > 0)
   <div class="notice warn mt" style="align-items:center;gap:12px">
-    <span class="ic">🔔</span>
+    <span class="ic"><x-icon name="bell" /></span>
     <div style="flex:1">
       <b>{{ $pending->count() }} permintaan menunggu persetujuan.</b>
       @if($flagged > 0)<span class="t-sub"> · {{ $flagged }} di antaranya over-request.</span>@endif
     </div>
-    <a href="{{ route('permintaan.index', ['view' => 'masuk']) }}" class="btn btn-pri btn-sm" style="flex:0 0 auto">Lihat &amp; Proses →</a>
+    <a href="{{ route('permintaan.index', ['view' => 'masuk']) }}" class="btn btn-pri btn-sm" style="flex:0 0 auto">Lihat &amp; Proses <x-icon name="arrow-right" width="13" height="13" style="vertical-align:-2px" /></a>
   </div>
 @else
   <div class="notice ok-notice mt" style="align-items:center">
-    <span class="ic">✓</span>
+    <span class="ic"><x-icon name="check-circle" /></span>
     <div><b>Tidak ada permintaan pending.</b> Semua permintaan sudah diproses.</div>
   </div>
 @endif
@@ -126,7 +122,7 @@
         </div>
       @empty
         <div class="empty" style="padding:32px 0">
-          <div class="ic">✓</div>
+          <div class="empty-ic"><x-icon name="check" /></div>
           <b>Belum ada yang diproses bulan ini</b>
         </div>
       @endforelse

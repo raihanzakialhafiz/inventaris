@@ -99,7 +99,7 @@
 <div class="settings">
 
   @if($errors->any())
-    <div class="notice warn" style="margin-bottom:16px"><span class="ic">⚠</span><div>{{ $errors->first() }}</div></div>
+    <div class="notice warn" style="margin-bottom:16px"><span class="ic"><x-icon name="alert" /></span><div>{{ $errors->first() }}</div></div>
   @endif
 
   {{-- Isian wajib yang tersembunyi tidak bisa difokuskan browser: form menolak
@@ -221,7 +221,7 @@
               <div class="img-box">
                 <img class="prev" src="{{ asset('storage/'.$settings['logo']) }}" alt="Logo" style="height:44px;width:44px;padding:4px">
                 <div class="meta"><b>Logo aktif</b><span>Unggah baru untuk mengganti</span></div>
-                <button type="submit" form="del-logo-form" class="btn btn-danger btn-sm">✕ Hapus</button>
+                <button type="submit" form="del-logo-form" class="btn btn-danger btn-sm"><x-icon name="x" width="13" height="13" /> Hapus</button>
               </div>
             @endif
             <x-file-drop name="logo" accept="image/png,image/jpeg,image/webp" hint="PNG / JPG / WEBP · maks 1 MB" />
@@ -232,7 +232,7 @@
               <div class="img-box">
                 <img class="prev" src="{{ asset('storage/'.$settings['favicon']) }}" alt="Favicon" style="height:32px;width:32px;padding:3px">
                 <div class="meta"><b>Favicon aktif</b><span>Unggah baru untuk mengganti</span></div>
-                <button type="submit" form="del-favicon-form" class="btn btn-danger btn-sm">✕ Hapus</button>
+                <button type="submit" form="del-favicon-form" class="btn btn-danger btn-sm"><x-icon name="x" width="13" height="13" /> Hapus</button>
               </div>
             @endif
             <x-file-drop name="favicon" accept="image/png,image/x-icon,.ico" hint="PNG / ICO · maks 256 KB" />
@@ -255,7 +255,7 @@
               <img src="{{ asset('storage/'.$settings['login_image']) }}" alt="Gambar Login"
                    style="width:100%;height:160px;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
               <div style="margin-top:8px">
-                <button type="submit" form="del-login_image-form" class="btn btn-danger btn-sm">✕ Hapus Gambar</button>
+                <button type="submit" form="del-login_image-form" class="btn btn-danger btn-sm"><x-icon name="x" width="13" height="13" /> Hapus Gambar</button>
               </div>
             </div>
           @endif

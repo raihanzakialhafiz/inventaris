@@ -37,7 +37,7 @@
       <button type="submit" class="btn-main">Simpan Kata Sandi Baru</button>
     </form>
 
-    <a href="{{ route('login') }}" class="back-link">← Kembali ke halaman masuk</a>
+    <a href="{{ route('login') }}" class="back-link"><x-icon name="arrow-left" width="14" height="14" style="vertical-align:-2px" /> Kembali ke halaman masuk</a>
   </div>
 </body>
 </html>

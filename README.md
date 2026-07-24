@@ -24,11 +24,11 @@ Dibangun dengan **Laravel 13** + **MySQL**. Tanpa langkah build frontend (aset s
 ### 1. Ambil kode & masuk foldernya
 
 ```bash
-git clone <url-repository> inventaris-atk
-cd inventaris-atk
+git clone <url-repository> inventaris
+cd inventaris
 ```
 
-Bila memakai Laragon, letakkan folder ini di `C:\laragon\www\` agar otomatis dapat domain `http://inventaris-atk.test`.
+Bila memakai Laragon, letakkan folder ini di `C:\laragon\www\` agar otomatis dapat domain `http://inventaris.test`.
 
 ### 2. Pasang dependensi
 

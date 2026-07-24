@@ -36,7 +36,7 @@
                   {{-- Tombol selalu tampil; satuan yang masih dipakai barang
                        ditolak server dengan pesan jelas (SatuanController). --}}
                   <form method="POST" action="{{ route('satuan.destroy', $s) }}" style="display:inline"
-                        data-confirm="Hapus satuan {{ $s->name }}?{{ $s->items_using > 0 ? ' Satuan ini masih dipakai '.$s->items_using.' barang dan hanya bisa dihapus setelah tidak terpakai.' : '' }}"
+                        data-confirm="Hapus satuan {{ $s->name }}?{{ $s->items_using > 0 ? ' Satuan ini masih dipakai '.$s->items_using.' barang dan hanya bisa dihapus setelah tidak terpakai.' : ' Bisa dipulihkan dari Sampah.' }}"
                         data-confirm-variant="danger" data-confirm-ok="Hapus">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
@@ -54,7 +54,7 @@
         @endif
       @else
         <div class="empty">
-          <div class="empty-ic">⊚</div>
+          <div class="empty-ic"><x-icon name="ruler" /></div>
           <b>Belum ada satuan</b>
           <p>Tambah satuan agar bisa dipilih saat menambah barang.</p>
         </div>
@@ -68,7 +68,7 @@
       <div class="modal" style="display:flex;max-width:460px">
         <div class="modal-head">
           <h3 x-text="editData.id ? 'Edit Satuan' : 'Tambah Satuan'"></h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form :action="editData.id ? '/satuan/'+editData.id : '/satuan'" method="POST">

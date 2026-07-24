@@ -2,7 +2,7 @@
 <aside class="sidebar">
   <div class="brand">
     @if(setting('logo'))
-      <div class="brand-mark" style="background:#fff;padding:4px">
+      <div class="brand-mark" style="background:var(--surface);padding:4px">
         <img src="{{ asset('storage/'.setting('logo')) }}" alt="Logo" style="width:100%;height:100%;object-fit:contain">
       </div>
     @else

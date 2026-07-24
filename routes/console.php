@@ -5,8 +5,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
 
-// Jadwal reminder stok menipis — dapat diatur admin (Pengaturan Email):
-// setiap N hari pada jam H. Default: setiap hari jam 07:00.
 $alertDays = 1;
 $alertHour = 7;
 if (Schema::hasTable('settings')) {
@@ -18,8 +16,6 @@ $alertTime = sprintf('%02d:00', $alertHour);
 if ($alertDays <= 1) {
     Schedule::command('stock:check-minimum')->dailyAt($alertTime)->runInBackground();
 } else {
-    // Dicek harian, dikirim bila sudah N hari sejak kiriman terakhir.
-    // (Cron */N tidak dipakai: hitungannya ter-reset tiap awal bulan.)
     Schedule::command('stock:check-minimum')
         ->dailyAt($alertTime)
         ->when(function () use ($alertDays) {

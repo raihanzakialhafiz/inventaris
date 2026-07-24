@@ -55,7 +55,7 @@
     <span class="filter-spacer"></span>
 
     @if(request()->hasAny(['search','date_from','date_to']))
-      <a href="{{ route('barang-masuk.index') }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+      <a href="{{ route('barang-masuk.index') }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
     @endif
   </form>
 
@@ -109,7 +109,7 @@
         </div>
       @else
         <div class="empty">
-          <div class="empty-ic">↓</div>
+          <div class="empty-ic"><x-icon name="inbox-in" /></div>
           <b>Belum ada data barang masuk</b>
           <p>Data penerimaan barang dari supplier akan tampil di sini.</p>
         </div>
@@ -124,7 +124,7 @@
       <div class="modal" style="display:flex;max-width:680px">
         <div class="modal-head">
           <h3>Input Barang Masuk</h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form method="POST" action="{{ route('barang-masuk.store') }}" @submit="saveMasuk($event)">
@@ -160,7 +160,7 @@
                   <label x-show="idx===0" style="font-size:12px">Jumlah</label>
                   <input type="number" :name="'items['+idx+'][qty]'" x-model="line.qty" min="1" required class="qty-inp" style="width:100%">
                 </div>
-                <button type="button" class="btn btn-danger btn-sm" @click="removeLine(idx)" x-show="lines.length > 1" title="Hapus baris">✕</button>
+                <button type="button" class="btn btn-danger btn-sm" @click="removeLine(idx)" x-show="lines.length > 1" title="Hapus baris"><x-icon name="x" width="13" height="13" /></button>
               </div>
             </template>
 
@@ -182,7 +182,7 @@
         <div class="modal" style="display:flex;max-width:640px">
           <div class="modal-head">
             <h3>Detail Barang Masuk · {{ $si->transaction_no }}</h3>
-            <button type="button" class="close-btn" @click="detailId = null">✕</button>
+            <button type="button" class="close-btn" @click="detailId = null"><x-icon name="x" width="16" height="16" /></button>
           </div>
           <div class="modal-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:16px">

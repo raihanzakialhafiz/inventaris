@@ -8,13 +8,11 @@
 {{-- Stat Cards --}}
 <div class="grid g-4">
   <div class="stat">
-    <div class="accent"></div>
     <div class="lbl">Permintaan Periode Ini</div>
     <div class="val">{{ $myReqs->count() }}</div>
     <div class="tag badge b-neutral">{{ $period }}</div>
   </div>
   <div class="stat {{ $pending > 0 ? 'warn' : 'ok' }}">
-    <div class="accent"></div>
     <div class="lbl">Menunggu Kasubag</div>
     <div class="val">{{ $pending }}</div>
     <div class="tag badge {{ $pending > 0 ? 'b-warn' : 'b-ok' }}">
@@ -22,13 +20,11 @@
     </div>
   </div>
   <div class="stat {{ $selesai > 0 ? 'ok' : '' }}">
-    <div class="accent"></div>
     <div class="lbl">Selesai Didistribusikan</div>
     <div class="val">{{ $selesai }}</div>
     <div class="tag badge b-ok">Diterima bidang</div>
   </div>
   <div class="stat ok">
-    <div class="accent"></div>
     <div class="lbl">Total Item Diterima</div>
     <div class="val">{{ $totalDiterima }}</div>
     <div class="tag badge b-ok">unit ATK periode ini</div>
@@ -64,7 +60,7 @@
         </div>
       @empty
         <div class="empty" style="padding:32px 0">
-          <div class="ic" style="font-size:22px">✓</div>
+          <div class="empty-ic"><x-icon name="check" /></div>
           <b>Belum ada pemakaian bulan ini</b>
         </div>
       @endforelse
@@ -83,7 +79,7 @@
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <a href="{{ route('permintaan.show', $req) }}" class="code">{{ $req->request_no }}</a>
             <x-status-badge :status="$req->status" />
-            @if($req->is_flagged)<span class="badge b-danger" style="font-size:10px">⚠ Over-Request</span>@endif
+            @if($req->is_flagged)<span class="badge b-danger" style="font-size:10px"><x-icon name="alert" width="11" height="11" style="vertical-align:-1px" /> Over-Request</span>@endif
             <span class="t-sub" style="margin-left:auto;white-space:nowrap">{{ $req->request_date->format('d M') }}</span>
           </div>
           <div class="t-sub" style="margin-top:5px;font-size:12px">
@@ -91,7 +87,7 @@
           </div>
         </div>
       @empty
-        <div class="empty" style="padding:24px 0"><div class="ic">☷</div><b>Belum ada permintaan</b></div>
+        <div class="empty" style="padding:24px 0"><div class="empty-ic"><x-icon name="rows" /></div><b>Belum ada permintaan</b></div>
       @endforelse
       <div style="padding:12px 18px">
         <a href="{{ route('permintaan.index') }}" class="btn btn-pri" style="width:100%;justify-content:center">

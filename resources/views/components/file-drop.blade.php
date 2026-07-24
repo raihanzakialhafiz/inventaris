@@ -63,7 +63,7 @@
         <b x-text="nama"></b>
         <span><span x-text="ukuran"></span> · siap diunggah, klik Simpan</span>
       </div>
-      <button type="button" class="btn btn-ghost btn-sm" @click.stop="batal()">✕ Batal</button>
+      <button type="button" class="btn btn-ghost btn-sm" @click.stop="batal()"><x-icon name="x" width="13" height="13" /> Batal</button>
     </div>
   </div>
 </div>

@@ -46,7 +46,7 @@
       </div>
     @empty
       <div class="empty" style="padding:36px 0">
-        <div class="empty-ic">◎</div>
+        <div class="empty-ic"><x-icon name="target" /></div>
         <b>Belum ada data kuota</b>
         <p>Kuota akan muncul begitu ada barang terdaftar.</p>
       </div>

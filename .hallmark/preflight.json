@@ -1,0 +1,35 @@
+{
+  "scanned": "2026-07-23",
+  "design_md": null,
+  "font_stack": {
+    "display": "Plus Jakarta Sans",
+    "body": "Plus Jakarta Sans",
+    "mono": "JetBrains Mono",
+    "source": "Google Fonts link — resources/views/layouts/app.blade.php:10",
+    "tokens": "--sans / --mono — public/css/siatk.css:26-27"
+  },
+  "palette": {
+    "format": "hex custom properties",
+    "location": "public/css/siatk.css :root (L1-33)",
+    "paper": "#E9F1EE",
+    "surface": "#FFFFFF",
+    "ink": "#0F172A",
+    "accent": "#0D9488",
+    "accent_hue_label": "cool (teal ~180)",
+    "paper_band": "light"
+  },
+  "motion": {
+    "stance": "motion-cut",
+    "libraries": [],
+    "note": "Alpine.js 3.15.0 self-hosted (public/js/vendor/alpine.min.js) for interactivity, not motion. Transitions are hand-written CSS."
+  },
+  "spacing": {
+    "scale": null,
+    "note": "No --space-* tokens; padding/margin hard-coded in px throughout siatk.css"
+  },
+  "framework": "Laravel 13 + Blade, no build step (static assets in public/)",
+  "stylesheet": "public/css/siatk.css (single file, ~50KB, 26 view directories)",
+  "preserve": ["font_stack", "palette", "framework", "stylesheet_entry_point"],
+  "stamp_found": false,
+  "log_json_found": false
+}

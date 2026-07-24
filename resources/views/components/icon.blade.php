@@ -35,6 +35,19 @@
     'image'       => '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-5-5L5 21"/>',
     'shield'      => '<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.4-7.5 9.5-4.3-1.1-7.5-4.9-7.5-9.5V6L12 3Z"/><path d="m9 12 2 2 4-4"/>',
     'dot'         => '<circle cx="12" cy="12" r="3"/>',
+    // Ditambahkan untuk menggantikan glif teks (✕ ✓ ⚠ ↓ → ☷ ⏱ 📉) yang dulu
+    // dipakai sebagai ikon. Glif ikut font, bukan set ikon: goresannya beda,
+    // ukurannya tak sebanding, dan ☷ jadi kotak kosong di banyak Windows.
+    'x'           => '<path d="M6 6l12 12"/><path d="M18 6 6 18"/>',
+    'check'       => '<path d="m5 12.5 4.5 4.5L19 7"/>',
+    'alert'       => '<path d="M12 3.5 22 20H2L12 3.5Z"/><path d="M12 10v4"/><path d="M12 17h.01"/>',
+    'arrow-down'  => '<path d="M12 4v15"/><path d="m6 13 6 6 6-6"/>',
+    'arrow-right' => '<path d="M4 12h15"/><path d="m13 6 6 6-6 6"/>',
+    'arrow-left'  => '<path d="M20 12H5"/><path d="m11 18-6-6 6-6"/>',
+    'trending-down'=> '<path d="M3 7l7 7 4-4 7 7"/><path d="M21 12v5h-5"/>',
+    'rows'        => '<rect x="3" y="4" width="18" height="4.5" rx="1"/><rect x="3" y="12" width="18" height="4.5" rx="1"/><path d="M3 20h18"/>',
+    'info'        => '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/>',
+    'ban'         => '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
   ];
   $body = $paths[$name] ?? $paths['dot'];
 @endphp

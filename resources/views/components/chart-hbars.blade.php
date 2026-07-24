@@ -14,7 +14,7 @@
 @endphp
 
 @if($n === 0 || $rows->max() < 1)
-  <div class="empty" style="padding:26px 0"><div class="ic">▹▹</div><b>Belum ada data untuk ditampilkan</b></div>
+  <div class="empty" style="padding:26px 0"><div class="empty-ic"><x-icon name="bar-chart" /></div><b>Belum ada data untuk ditampilkan</b></div>
 @else
   @php
     $barH = 18; $gap = 14; $padL = 104; $padR = 48; $padT = 6; $padB = 6;

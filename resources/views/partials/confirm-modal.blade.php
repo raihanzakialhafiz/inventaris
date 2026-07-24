@@ -8,7 +8,7 @@
   <div class="modal" style="display:flex" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
     <div class="modal-head">
       <h3 id="confirm-title" data-confirm-title>Konfirmasi</h3>
-      <button type="button" class="close-btn" data-confirm-cancel aria-label="Tutup">✕</button>
+      <button type="button" class="close-btn" data-confirm-cancel aria-label="Tutup"><x-icon name="x" width="16" height="16" /></button>
     </div>
     <div class="modal-body">
       <p class="cf-msg" data-confirm-msg>Apakah Anda yakin?</p>

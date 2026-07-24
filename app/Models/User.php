@@ -103,15 +103,29 @@ class User extends Authenticatable
         return filled($this->jabatan) ? $this->jabatan : $this->roleLabel();
     }
 
+    /**
+     * Warna avatar per peran. Sumber tunggal — halaman login memanggil ini juga
+     * lewat colorForRole(), jadi daftarnya tidak pernah bercabang dua.
+     *
+     * Semua nilai dipilih agar inisial PUTIH di atasnya lolos WCAG AA (4.5:1).
+     * Set sebelumnya gagal di tiga dari lima peran: kepala_bidang #EA580C
+     * (3.6:1), pimpinan #0891B2 (3.7:1), dan kasubag_umum #0D9488 (3.8:1) —
+     * inisialnya dirender 11–14px tebal, yang belum termasuk "teks besar".
+     */
+    public static function colorForRole(?string $role): string
+    {
+        return match($role) {
+            'admin'          => '#6D28D9',  // 7.1:1
+            'kasubag_umum'   => '#0F766E',  // 5.5:1
+            'petugas_gudang' => '#1D4ED8',  // 6.7:1
+            'kepala_bidang'  => '#C2410C',  // 5.2:1
+            'pimpinan'       => '#0E7490',  // 5.4:1
+            default          => '#475569',  // 7.6:1
+        };
+    }
+
     public function roleColor(): string
     {
-        return match($this->role) {
-            'admin'          => '#7C3AED',
-            'kasubag_umum'   => '#0D9488',
-            'petugas_gudang' => '#2563EB',
-            'kepala_bidang'  => '#EA580C',
-            'pimpinan'       => '#0891B2',
-            default          => '#64748B',
-        };
+        return static::colorForRole($this->role);
     }
 }

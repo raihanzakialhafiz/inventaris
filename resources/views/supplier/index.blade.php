@@ -22,7 +22,7 @@
     <span class="filter-spacer"></span>
 
     @if(request()->filled('search'))
-      <a href="{{ route('supplier.index') }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+      <a href="{{ route('supplier.index') }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
     @endif
 
   </form>
@@ -55,7 +55,7 @@
                     Edit
                   </button>
                   <form method="POST" action="{{ route('supplier.destroy', $sup) }}" style="display:inline"
-                        data-confirm="Hapus supplier {{ $sup->name }}?"
+                        data-confirm="Hapus supplier {{ $sup->name }}? Bisa dipulihkan dari Sampah."
                         data-confirm-variant="danger" data-confirm-ok="Hapus">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
@@ -74,7 +74,7 @@
         </div>
       @else
         <div class="empty">
-          <div class="empty-ic">⊡</div>
+          <div class="empty-ic"><x-icon name="truck" /></div>
           <b>Tidak ada supplier ditemukan</b>
           <p>Coba ubah kata kunci pencarian atau tambah supplier baru.</p>
         </div>
@@ -88,7 +88,7 @@
       <div class="modal" style="display:flex">
         <div class="modal-head">
           <h3 x-text="editData.id ? 'Edit Supplier' : 'Tambah Supplier'"></h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <form :action="editData.id ? '/supplier/'+editData.id : '/supplier'" method="POST">
@@ -96,16 +96,16 @@
             <template x-if="editData.id"><input type="hidden" name="_method" value="PUT"></template>
             <div class="field">
               <label>Nama Supplier <span style="color:var(--danger)">*</span></label>
-              <input type="text" name="name" :value="editData.name||''" required placeholder="PT / CV / UD ...">
+              <input type="text" name="name" :value="editData.name||''" required placeholder="PT / CV / UD …">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
               <div class="field" style="margin:0">
                 <label>Telepon</label>
-                <input type="text" name="phone" :value="editData.phone||''" placeholder="021-...">
+                <input type="text" name="phone" :value="editData.phone||''" placeholder="021-…">
               </div>
               <div class="field" style="margin:0">
                 <label>Email</label>
-                <input type="email" name="email" :value="editData.email||''" placeholder="info@...">
+                <input type="email" name="email" :value="editData.email||''" placeholder="info@…">
               </div>
             </div>
             <div class="field" style="margin-top:14px">

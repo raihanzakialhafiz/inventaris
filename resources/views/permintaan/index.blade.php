@@ -90,7 +90,7 @@
   <span class="filter-spacer"></span>
 
   @if(request()->hasAny(['search','status','dept','flagged']))
-    <a href="{{ route('permintaan.index', request('view') ? ['view' => request('view')] : []) }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+    <a href="{{ route('permintaan.index', request('view') ? ['view' => request('view')] : []) }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
   @endif
 </form>
 
@@ -116,7 +116,7 @@
               <td>{{ $req->request_date->isoFormat('D MMM Y') }}</td>
               <td>
                 @if($req->is_flagged)
-                  <span class="badge b-danger">⚠ Over</span>
+                  <span class="badge b-danger"><x-icon name="alert" width="11" height="11" style="vertical-align:-1px" /> Over</span>
                 @else
                   <span class="t-sub">—</span>
                 @endif
@@ -162,7 +162,7 @@
       </div>
     @else
       <div class="empty">
-        <div class="empty-ic">✉</div>
+        <div class="empty-ic"><x-icon name="file-text" /></div>
         <b>Tidak ada permintaan ditemukan</b>
         <p>Coba ubah filter status atau bidang untuk melihat data lain.</p>
       </div>
@@ -178,7 +178,7 @@
       <div class="modal" style="display:flex;max-width:460px">
         <div class="modal-head">
           <h3>Tolak Permintaan</h3>
-          <button class="close-btn" @click="rejectOpen=false">✕</button>
+          <button class="close-btn" @click="rejectOpen=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <p class="t-sub" style="margin-bottom:12px">Menolak permintaan <b x-text="rejectNo"></b>. Berikan alasan penolakan.</p>
@@ -207,12 +207,12 @@
       <div class="modal" style="display:flex;max-width:720px">
         <div class="modal-head">
           <h3>Detail Permintaan · {{ $req->request_no }}</h3>
-          <button type="button" class="close-btn" @click="detailId = null">✕</button>
+          <button type="button" class="close-btn" @click="detailId = null"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
             <x-status-badge :status="$req->status" />
-            @if($req->is_flagged)<span class="badge b-danger">⚠ Over-Request</span>@endif
+            @if($req->is_flagged)<span class="badge b-danger"><x-icon name="alert" width="11" height="11" style="vertical-align:-1px" /> Over-Request</span>@endif
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:16px">
@@ -225,13 +225,13 @@
           </div>
 
           @if($req->justification)
-            <div class="notice info" style="margin-bottom:10px"><span class="ic">ℹ</span><div><b>Justifikasi:</b> {{ $req->justification }}</div></div>
+            <div class="notice info" style="margin-bottom:10px"><span class="ic"><x-icon name="info" /></span><div><b>Justifikasi:</b> {{ $req->justification }}</div></div>
           @endif
           @if($req->rejection_reason)
-            <div class="notice danger" style="margin-bottom:10px"><span class="ic">⚠</span><div><b>Alasan penolakan:</b> {{ $req->rejection_reason }}</div></div>
+            <div class="notice danger" style="margin-bottom:10px"><span class="ic"><x-icon name="alert" /></span><div><b>Alasan penolakan:</b> {{ $req->rejection_reason }}</div></div>
           @endif
           @if($req->note)
-            <div class="notice info" style="margin-bottom:10px"><span class="ic">•</span><div>{{ $req->note }}</div></div>
+            <div class="notice info" style="margin-bottom:10px"><span class="ic"><x-icon name="dot" /></span><div>{{ $req->note }}</div></div>
           @endif
 
           <table>
@@ -268,7 +268,7 @@
       <div class="modal" style="display:flex;max-width:680px">
         <div class="modal-head">
           <h3>Ajukan Permintaan ATK</h3>
-          <button class="close-btn" @click="showModal=false">✕</button>
+          <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
         </div>
         <div class="modal-body">
           <p class="t-sub" style="margin-bottom:14px">Permintaan atas nama <b>{{ $user->department->name ?? '—' }}</b>. Sistem memeriksa kuota otomatis.</p>
@@ -294,7 +294,7 @@
                   <label x-show="idx===0" style="font-size:12px">Jumlah</label>
                   <input type="number" :name="'items['+idx+'][qty]'" x-model="line.qty" min="1" required class="qty-inp" style="width:100%">
                 </div>
-                <button type="button" class="btn btn-danger btn-sm" @click="removeLine(idx)" x-show="lines.length > 1" title="Hapus baris">✕</button>
+                <button type="button" class="btn btn-danger btn-sm" @click="removeLine(idx)" x-show="lines.length > 1" title="Hapus baris"><x-icon name="x" width="13" height="13" /></button>
               </div>
             </template>
 
@@ -304,7 +304,7 @@
             </div>
             {{-- Peringatan BLOKIR: kuota bidang berpolicy "block" terlampaui. --}}
             <div class="notice danger" x-show="isBlocked()" x-cloak style="margin-top:12px">
-              <span class="ic">⛔</span>
+              <span class="ic"><x-icon name="ban" /></span>
               <div>Sebagian barang melebihi kuota bidang dengan kebijakan <b>blokir</b>. Kurangi jumlah agar permintaan bisa diajukan.</div>
             </div>
 
@@ -321,7 +321,7 @@
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
               <button type="button" class="btn btn-ghost" @click="showModal=false">Batal</button>
               <button type="submit" class="btn btn-pri" :disabled="isBlocked()"
-                      :style="isBlocked() ? 'opacity:.5;cursor:not-allowed' : ''">Kirim Permintaan →</button>
+                      :style="isBlocked() ? 'opacity:.5;cursor:not-allowed' : ''">Kirim Permintaan <x-icon name="arrow-right" width="14" height="14" style="vertical-align:-2px" /></button>
             </div>
           </form>
         </div>

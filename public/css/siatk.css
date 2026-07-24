@@ -1,34 +1,89 @@
+/* Hallmark · audit-fix pass · 2026-07-23 · nada: utilitarian
+ *
+ * BUKAN pembangunan ulang: makrostruktur, tata letak, dan alur halaman tidak
+ * disentuh — jadi berkas ini sengaja TIDAK membawa cap `macrostructure:`.
+ * Yang diperbaiki: kontras, disiplin token, kurva & durasi bernama, penanda
+ * fokus yang muncul seketika, penghapusan garis-tepi-kiri sebagai penanda
+ * status, dan animasi masuk yang terputar ulang tiap pindah halaman.
+ *
+ * Aturan berkas ini: setiap warna dan setiap radius lewat var(--token).
+ * Kalau butuh nilai yang belum ada, tambahkan tokennya dulu di :root —
+ * jangan tulis hex mentah di tengah aturan.
+ */
 :root {
   --bg:            #E9F1EE;
   --surface:       #FFFFFF;
   --surface-2:     #F8FAFC;
   --surface-soft:  #F5F9F7;
-  --ink:           #0F172A;
-  --muted:         #64748B;
-  --faint:         #94A3B8;
+
+  /* Tangga teks — nilai kontras diukur di atas --surface (putih).
+     Pakai --muted ke bawah HANYA untuk teks; --faint khusus ikon,
+     chevron, dan kontrol nonaktif (lolos 3:1 non-teks, bukan 4.5:1). */
+  --ink:           #0F172A;  /* 16.9:1 */
+  --ink-2:         #334155;  /* 10.4:1 — label form, item dropdown   */
+  --ink-3:         #475569;  /*  7.6:1 — item nav, tombol ikon       */
+  --muted:         #64748B;  /*  4.8:1 — teks sekunder, placeholder  */
+  --faint:         #8494A8;  /*  3.1:1 — NON-TEKS saja               */
+
   --primary:       #0D9488;
-  --primary-dark:  #0F766E;
+  --primary-dark:  #0F766E;  /* teks putih di atas ini = 5.5:1       */
+  --primary-darker:#0B5F58;  /* hover tombol utama          = 7.5:1  */
   --primary-light: #14B8A6;
   --primary-soft:  #F0FDFA;
+  --primary-soft-2:#CBEEE7;
+  --primary-line:  #99D6CF;
+  --primary-off:   #A7D3CE;  /* isian tombol utama saat disabled     */
+  --on-accent:     #FFFFFF;  /* teks di atas isian berwarna pekat    */
+
   --line:          #E6EEEB;
   --line-strong:   #E2E8F0;
+  --line-soft:     #F1F5F9;
+  --row-stripe:    rgba(13,148,136,.025);
+  --row-hover:     rgba(13,148,136,.05);
+
   --ok:            #15803D;
+  --ok-2:          #166534;
   --ok-bg:         #F0FDF4;
   --ok-line:       #BBF7D0;
   --warn:          #B45309;
+  --warn-2:        #92400E;
   --warn-bg:       #FEF3C7;
   --warn-line:     #FDE68A;
   --danger:        #DC2626;
   --danger-2:      #B91C1C;
   --danger-bg:     #FEE2E2;
   --danger-line:   #FECACA;
+
   --shadow:        0 1px 2px rgba(15,23,42,.04), 0 8px 20px rgba(15,23,42,.06);
   --shadow-lg:     0 18px 50px rgba(15,23,42,.14);
   --mono:          'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, "Cascadia Mono", "Roboto Mono", monospace;
   --sans:          'Plus Jakarta Sans', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+
+  --radius-xs:     8px;
+  --radius-sm:     10px;
   --radius:        12px;
   --radius-lg:     18px;
   --radius-xl:     20px;
+
+  /* Kurva & durasi bernama — jangan pakai `ease` bawaan browser.
+     --dur-1 untuk umpan balik hover/tekan, --dur-3 untuk masuk/keluar panel. */
+  --ease-out:      cubic-bezier(.16, 1, .3, 1);
+  --ease-in:       cubic-bezier(.7, 0, .84, 0);
+  --ease-in-out:   cubic-bezier(.65, 0, .35, 1);
+  --dur-1:         90ms;
+  --dur-2:         140ms;
+  --dur-3:         220ms;
+
+  /* Tangga lapisan — enam tingkat bernama, tanpa angka karangan. */
+  --z-sticky:      20;
+  --z-overlay:     40;
+  --z-panel:       50;
+  --z-popover:     55;  /* panel select — di atas modal, di bawah konfirmasi */
+  --z-confirm:     60;
+  --z-idle:        70;
+  --z-toast:       100;
+  --z-loading:     110; /* bilah muat halaman; pointer-events: none */
+
   --sb-w:          250px;
   --topbar-h:      66px;
 }
@@ -51,63 +106,32 @@ button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; font-size: 14px; }
 h1, h2, h3, h4 { margin: 0; letter-spacing: -.01em; }
 a { color: var(--primary-dark); }
-:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+/* Cincin fokus tampil SEKETIKA — jangan pernah ditransisikan. */
+:focus-visible { outline: 2px solid var(--primary-dark); outline-offset: 2px; border-radius: 6px; }
 
-/* ---------- LOGIN ---------- */
-.login-wrap {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background:
-    radial-gradient(1200px 600px at 70% -10%, #14B8A6 0%, transparent 60%),
-    linear-gradient(160deg, #115E59, #0F766E);
-}
-.login-card {
-  background: var(--surface);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 24px 60px rgba(8,40,46,.35);
-  width: 100%;
-  max-width: 460px;
-  padding: 34px 32px;
-  border: 1px solid rgba(255,255,255,.4);
-}
+/* ---------- BRAND ---------- */
 .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
 .brand-mark {
   width: 42px; height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(150deg, var(--primary-dark), var(--primary));
-  color: #fff;
+  border-radius: var(--radius);
+  background: var(--primary-dark);
+  color: var(--on-accent);
   display: grid; place-items: center;
   font-weight: 800; font-size: 18px;
   letter-spacing: -.04em;
-  box-shadow: 0 6px 16px rgba(13,148,136,.3);
   flex: 0 0 auto;
-  transition: transform .15s;
 }
 .brand h1 { font-size: 18px; }
 .brand p  { margin: 1px 0 0; color: var(--muted); font-size: 12.5px; }
-.login-card h2  { font-size: 15px; margin: 26px 0 4px; }
-.login-card .sub{ color: var(--muted); font-size: 13px; margin-bottom: 16px; }
-.role-grid { display: grid; gap: 10px; }
-.role-btn {
-  display: flex; align-items: center; gap: 13px; text-align: left;
-  background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 12px 14px; transition: .15s;
-}
-.role-btn:hover { border-color: var(--primary); background: var(--primary-soft); transform: translateY(-1px); }
+/* Dipakai topbar & panel profil (bukan sisa halaman login). */
 .role-ava {
-  width: 36px; height: 36px; border-radius: 10px;
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
   flex: 0 0 auto; display: grid; place-items: center;
-  font-weight: 700; color: #fff; font-size: 13px;
+  font-weight: 700; color: var(--on-accent); font-size: 13px;
 }
-.role-meta { flex: 1; }
-.role-meta b    { display: block; font-size: 13.5px; }
-.role-meta span { color: var(--muted); font-size: 12px; }
-.role-arrow { color: var(--faint); font-size: 18px; }
 
 /* ---------- APP SHELL ---------- */
-.app { display: none; min-height: 100vh; grid-template-columns: var(--sb-w) 1fr; transition: grid-template-columns .22s ease; }
+.app { display: none; min-height: 100vh; grid-template-columns: var(--sb-w) 1fr; transition: grid-template-columns var(--dur-3) var(--ease-out); }
 .app.show { display: grid; }
 .app.sb-mini { --sb-w: 56px; }
 
@@ -118,7 +142,7 @@ a { color: var(--primary-dark); }
   padding: 14px 12px;
   display: flex; flex-direction: column;
   position: sticky; top: 0; height: 100vh; overflow: hidden;
-  width: var(--sb-w); transition: width .22s ease;
+  width: var(--sb-w); transition: width var(--dur-3) var(--ease-out);
   flex: 0 0 auto;
 }
 .sidebar .brand { margin: 2px 6px 12px; overflow: hidden; flex: 0 0 auto; }
@@ -148,17 +172,18 @@ a { color: var(--primary-dark); }
 
 .nav-label {
   font-size: 10.5px; text-transform: uppercase;
-  letter-spacing: .12em; color: var(--faint);
+  letter-spacing: .12em; color: var(--muted);
   margin: 10px 8px 3px;
   overflow: hidden; white-space: nowrap;
-  transition: opacity .15s;
+  transition: opacity var(--dur-2) var(--ease-out);
 }
 .nav-item {
   display: flex; align-items: center; gap: 11px;
-  padding: 8px 12px; border-radius: 10px;
-  color: #475569; font-size: 13.5px;
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  color: var(--ink-3); font-size: 13.5px;
   border: none; background: none;
-  width: 100%; text-align: left; transition: background .12s, color .12s;
+  width: 100%; text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
   white-space: nowrap; overflow: hidden;
   text-decoration: none; position: relative;
 }
@@ -191,7 +216,7 @@ a { color: var(--primary-dark); }
   display: flex; align-items: center; gap: 10px; overflow: hidden;
 }
 .foot-ava {
-  width: 30px; height: 30px; border-radius: 9px; color: #fff;
+  width: 30px; height: 30px; border-radius: var(--radius-xs); color: var(--on-accent);
   display: grid; place-items: center; font-size: 11px; font-weight: 700;
   flex: 0 0 auto; letter-spacing: .02em;
 }
@@ -234,13 +259,14 @@ a { color: var(--primary-dark); }
   height: var(--topbar-h);
   background: var(--surface); border-bottom: 1px solid var(--line);
   display: flex; align-items: center; gap: 0;
-  padding: 0 22px 0 10px; position: sticky; top: 0; z-index: 20;
+  padding: 0 22px 0 10px; position: sticky; top: 0; z-index: var(--z-sticky);
 }
 .topbar-toggle {
   background: none; border: none;
   width: 40px; height: 40px; border-radius: 11px;
   color: var(--muted); display: grid; place-items: center;
-  flex: 0 0 auto; transition: background .12s, color .12s;
+  flex: 0 0 auto;
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
   margin-right: 6px;
 }
 .topbar-toggle:hover { background: var(--surface-2); color: var(--ink); }
@@ -248,7 +274,7 @@ a { color: var(--primary-dark); }
 .topbar-divider { width: 1px; height: 22px; background: var(--line); flex: 0 0 auto; margin: 0 12px; }
 .topbar-title { flex: 1; min-width: 0; overflow: hidden; }
 .topbar .page-title { font-size: 15px; font-weight: 800; letter-spacing: -.2px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.topbar .crumb      { font-size: 11px; color: var(--faint); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar .crumb      { font-size: 11px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
 
 .role-switch {
@@ -262,17 +288,17 @@ a { color: var(--primary-dark); }
 .who { display: flex; align-items: center; gap: 9px; }
 .who .role-ava {
   width: 36px; height: 36px; border-radius: 10px; font-size: 12px;
-  display: grid; place-items: center; font-weight: 700; color: #fff; flex: 0 0 auto;
+  display: grid; place-items: center; font-weight: 700; color: var(--on-accent); flex: 0 0 auto;
 }
 .who b    { font-size: 13px; display: block; line-height: 1.2; }
 .who span { font-size: 11.5px; color: var(--muted); }
 
 .btn-logout {
   background: none; border: 1px solid var(--line);
-  border-radius: 10px; padding: 7px 12px;
+  border-radius: var(--radius-sm); padding: 7px 12px;
   color: var(--muted); font-size: 12.5px;
   display: inline-flex; align-items: center; gap: 5px;
-  transition: .12s;
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .btn-logout:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
 
@@ -290,53 +316,66 @@ a { color: var(--primary-dark); }
   border: 1px solid var(--line); border-radius: 12px;
   background: var(--surface-soft); font-size: 13.5px; color: var(--ink); outline: none;
   -webkit-appearance: none; appearance: none;
-  transition: border-color .15s, box-shadow .15s, background .15s;
+  /* Hanya latar yang ditransisikan: border & cincin adalah penanda fokus,
+     dan penanda fokus HARUS muncul seketika bagi pengguna papan ketik. */
+  transition: background-color var(--dur-2) var(--ease-out);
 }
 .topbar-search input[type=search]::-webkit-search-cancel-button { -webkit-appearance: none; }
-.topbar-search input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-soft); }
-.topbar-search input::placeholder { color: var(--faint); }
+.topbar-search input:focus { border-color: var(--primary-dark); background: var(--surface); box-shadow: 0 0 0 3px var(--primary-soft); }
+.topbar-search input::placeholder { color: var(--muted); }
 .search-kbd {
   position: absolute; right: 9px; display: flex; align-items: center; justify-content: center;
-  min-width: 22px; height: 22px; padding: 0 6px; font-size: 11px; font-weight: 700; color: var(--faint);
-  background: #fff; border: 1px solid var(--line); border-radius: 7px; pointer-events: none;
+  min-width: 22px; height: 22px; padding: 0 6px; font-size: 11px; font-weight: 700; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xs); pointer-events: none;
 }
 
 /* ---------- TOPBAR: icon button + dropdowns ---------- */
 .icon-btn {
   position: relative; width: 44px; height: 44px; flex: 0 0 auto;
-  border: 1px solid var(--line); border-radius: 13px; background: var(--surface);
-  color: #475569; display: flex; align-items: center; justify-content: center; transition: .12s;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  color: var(--ink-3); display: flex; align-items: center; justify-content: center;
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
 .icon-badge {
   position: absolute; top: 7px; right: 8px; min-width: 17px; height: 17px; padding: 0 4px;
-  border-radius: 9px; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700;
+  border-radius: var(--radius-sm); background: var(--danger-2); color: var(--on-accent); font-size: 10px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface);
 }
 .dd { position: relative; }
 .dd-panel {
-  position: absolute; top: 52px; right: 0; z-index: 50;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  position: absolute; top: 52px; right: 0; z-index: var(--z-panel);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg); overflow: hidden;
 }
+/* 100vw disengaja: panel ini absolute di dalam .dd selebar 44px, jadi batasnya
+   memang harus viewport. Selisih lebar scrollbar hanya mengikat di lebar ponsel,
+   yang scrollbar-nya overlay (0px) — jadi aman. */
 .notif-panel { width: 340px; max-width: calc(100vw - 32px); }
 .dd-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 12px; font-size: 14px; font-weight: 800; }
 .dd-count { font-size: 11px; font-weight: 700; color: var(--primary-dark); background: var(--primary-soft); padding: 2px 9px; border-radius: 20px; }
 .dd-count-btn { font-size: 11px; font-weight: 700; color: var(--primary-dark); background: var(--primary-soft); padding: 3px 10px; border-radius: 20px; border: none; cursor: pointer; }
-.dd-count-btn:hover { background: var(--primary); color: #fff; }
+.dd-count-btn:hover { background: var(--primary-dark); color: var(--on-accent); }
 .notif-list { max-height: 360px; overflow-y: auto; padding: 0 8px 8px; }
-.notif-item { display: flex; gap: 11px; padding: 11px 10px; border-radius: 11px; text-decoration: none; color: inherit; }
+.notif-item { display: flex; gap: 11px; padding: 11px 10px; border-radius: var(--radius-sm); text-decoration: none; color: inherit; }
 .notif-item:hover { background: var(--surface-2); }
 .notif-item.unread { background: var(--primary-soft); }
-.notif-item.unread:hover { background: #cbeee7; }
+.notif-item.unread:hover { background: var(--primary-soft-2); }
 .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-top: 5px; flex: 0 0 auto; }
 .notif-ic {
-  width: 32px; height: 32px; border-radius: 9px; flex: 0 0 auto; margin-top: 2px;
-  display: grid; place-items: center; font-size: 15px; font-weight: 700; line-height: 1;
+  width: 32px; height: 32px; border-radius: var(--radius-xs); flex: 0 0 auto; margin-top: 2px;
+  display: grid; place-items: center; line-height: 1;
 }
-.notif-msg { font-size: 12.5px; line-height: 1.4; color: #1e293b; }
-.notif-time { font-size: 11px; color: var(--faint); margin-top: 2px; }
-.notif-empty { padding: 34px 16px; text-align: center; color: var(--faint); font-size: 12.5px; }
+.notif-ic svg { width: 16px; height: 16px; }
+/* Nada semantik per jenis notifikasi — menggantikan hex lepas per baris. */
+.notif-ic.tone-primary { background: var(--primary-soft); color: var(--primary-dark); }
+.notif-ic.tone-ok      { background: var(--ok-bg);        color: var(--ok-2); }
+.notif-ic.tone-warn    { background: var(--warn-bg);      color: var(--warn-2); }
+.notif-ic.tone-danger  { background: var(--danger-bg);    color: var(--danger-2); }
+.notif-ic.tone-neutral { background: var(--surface-2);    color: var(--muted); }
+.notif-msg { font-size: 12.5px; line-height: 1.4; color: var(--ink); }
+.notif-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.notif-empty { padding: 34px 16px; text-align: center; color: var(--muted); font-size: 12.5px; }
 .notif-foot { display: block; text-align: center; padding: 11px; border-top: 1px solid var(--line); font-size: 12.5px; font-weight: 700; color: var(--primary-dark); text-decoration: none; }
 .notif-foot:hover { background: var(--surface-2); }
 /* Full-page notification rows (/notifikasi) */
@@ -344,17 +383,18 @@ a { color: var(--primary-dark); }
 .notif-row:last-child { border-bottom: none; }
 .notif-row:hover { background: var(--surface-2); }
 .notif-row.unread { background: var(--primary-soft); }
-.notif-row.unread:hover { background: #cbeee7; }
+.notif-row.unread:hover { background: var(--primary-soft-2); }
 .notif-row-main { display: flex; gap: 12px; flex: 1; min-width: 0; padding: 14px 10px 14px 18px; text-decoration: none; color: inherit; align-items: flex-start; }
 .notif-row-del { display: flex; align-items: center; padding: 0 14px 0 4px; }
-.notif-row-msg { font-size: 13.5px; line-height: 1.45; color: #1e293b; margin-top: 4px; }
+.notif-row-msg { font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-top: 4px; }
 
 /* Square icon action button (table Aksi, notif delete, …) */
 .icon-act {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: 9px; flex: 0 0 auto;
+  width: 32px; height: 32px; border-radius: var(--radius-xs); flex: 0 0 auto;
   border: 1px solid var(--line); background: var(--surface); color: var(--muted);
-  cursor: pointer; transition: .12s; text-decoration: none; padding: 0;
+  cursor: pointer; text-decoration: none; padding: 0;
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .icon-act:hover { background: var(--surface-2); color: var(--ink); border-color: var(--line-strong); }
 .icon-act.ok { color: var(--ok); }
@@ -365,19 +405,20 @@ a { color: var(--primary-dark); }
 
 .profile-btn {
   display: flex; align-items: center; gap: 10px; height: 44px; padding: 4px 8px 4px 4px; flex: 0 0 auto;
-  border: 1px solid var(--line); border-radius: 13px; background: var(--surface); transition: .12s; max-width: 220px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-width: 220px;
+  transition: background-color var(--dur-1) var(--ease-out);
 }
 .profile-btn:hover { background: var(--surface-2); }
-.profile-btn .role-ava { width: 36px; height: 36px; border-radius: 10px; flex: 0 0 auto; color: #fff; font-weight: 700; font-size: 12px; display: grid; place-items: center; }
+.profile-btn .role-ava { width: 36px; height: 36px; border-radius: var(--radius-sm); flex: 0 0 auto; color: var(--on-accent); font-weight: 700; font-size: 12px; display: grid; place-items: center; }
 .profile-meta { line-height: 1.15; text-align: left; min-width: 0; }
 .profile-meta b { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-meta span { display: block; font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chev { color: var(--faint); display: flex; transition: transform .2s; flex: 0 0 auto; }
+.chev { color: var(--faint); display: flex; transition: transform var(--dur-3) var(--ease-out); flex: 0 0 auto; }
 .chev.flip { transform: rotate(180deg); }
 
 .profile-panel { width: 288px; max-width: calc(100vw - 32px); padding: 8px; }
 .profile-card { display: flex; align-items: center; gap: 11px; padding: 9px 11px 11px; }
-.profile-card .role-ava.lg { width: 44px; height: 44px; border-radius: 12px; flex: 0 0 auto; color: #fff; font-weight: 700; font-size: 14px; display: grid; place-items: center; }
+.profile-card .role-ava.lg { width: 44px; height: 44px; border-radius: var(--radius); flex: 0 0 auto; color: var(--on-accent); font-weight: 700; font-size: 14px; display: grid; place-items: center; }
 .profile-info { line-height: 1.3; min-width: 0; }
 .profile-info b { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); }
 .profile-info .mono { display: block; font-size: 11.5px; color: var(--muted); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -385,8 +426,8 @@ a { color: var(--primary-dark); }
 .dd-div { height: 1px; background: var(--line); margin: 6px 4px; }
 .dd-item {
   width: 100%; display: flex; align-items: center; gap: 11px; padding: 10px;
-  border: none; background: none; border-radius: 11px; cursor: pointer;
-  text-align: left; color: #334155; font-size: 13px; font-weight: 600; text-decoration: none;
+  border: none; background: none; border-radius: var(--radius-sm); cursor: pointer;
+  text-align: left; color: var(--ink-2); font-size: 13px; font-weight: 600; text-decoration: none;
 }
 .dd-item:hover { background: var(--surface-2); }
 .dd-item .dd-ic { display: flex; color: var(--faint); }
@@ -440,21 +481,23 @@ a { color: var(--primary-dark); }
 .g-3  { grid-template-columns: repeat(3, 1fr); }
 .mt   { margin-top: 16px; }
 
+/* Kartu statistik sengaja TANPA hover: ia bukan tautan, tidak bisa diklik.
+   Efek angkat/bayangan menjanjikan interaksi yang tidak ada. */
 .stat {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius-lg); padding: 18px 18px 16px;
   box-shadow: none; position: relative; overflow: hidden;
-  transition: box-shadow .15s, transform .15s;
 }
-.stat:hover { box-shadow: 0 10px 26px rgba(15,23,42,.08); transform: translateY(-1px); }
-.stat .lbl   { color: #475569; font-size: 12.5px; font-weight: 600; }
+.stat .lbl   { color: var(--ink-3); font-size: 12.5px; font-weight: 600; }
 .stat .val   { font-size: 28px; font-weight: 800; letter-spacing: -.03em; margin-top: 8px; font-variant-numeric: tabular-nums; }
 .stat .val small { font-size: 13px; font-weight: 600; color: var(--muted); }
 .stat .tag   { font-size: 11.5px; margin-top: 7px; display: inline-block; }
-.stat .accent{ position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); border-radius: 3px 0 0 3px; }
-.stat.warn   .accent { background: var(--warn); }
-.stat.danger .accent { background: var(--danger); }
-.stat.ok     .accent { background: var(--ok); }
+/* Status dibawa oleh warna ANGKA, bukan garis tepi kiri.
+   Hanya keadaan bermasalah yang diwarnai — kondisi normal tetap tinta biasa,
+   supaya yang menarik mata memang hanya yang perlu ditindaklanjuti.
+   (Badge .tag di bawah angka tetap menyebut statusnya dengan kata.) */
+.stat.warn   .val { color: var(--warn); }
+.stat.danger .val { color: var(--danger-2); }
 
 /* ---------- TABLE ---------- */
 table { width: 100%; border-collapse: collapse; }
@@ -470,12 +513,14 @@ thead th {
    atas container, bukan relatif topbar halaman. */
 .scroll-box thead th { top: 0; }
 tbody td {
-  padding: 13px 14px; border-bottom: 1px solid #F1F5F9;
+  padding: 13px 14px; border-bottom: 1px solid var(--line-soft);
   font-size: 13.5px; vertical-align: middle;
 }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:nth-child(even) { background: rgba(13,148,136,.025); }
-tbody tr:hover { background: rgba(13,148,136,.05) !important; cursor: default; }
+tbody tr:nth-child(even) { background: var(--row-stripe); }
+/* Tanpa `cursor: default` — barisnya berisi tautan & tombol yang berhak
+   menampilkan kursornya sendiri. */
+tbody tr:hover { background: var(--row-hover); }
 .num  { font-variant-numeric: tabular-nums; text-align: right; }
 .code { font-family: var(--mono); font-size: 12.5px; color: var(--primary-dark); white-space: nowrap; }
 .t-name { font-weight: 600; }
@@ -561,22 +606,26 @@ tbody tr:hover { background: rgba(13,148,136,.05) !important; cursor: default; }
   display: inline-flex; align-items: center; gap: 7px;
   border-radius: var(--radius); padding: 9px 16px;
   font-size: 13px; font-weight: 700;
-  border: 1px solid transparent; transition: .15s;
+  border: 1px solid transparent;
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
-.btn-pri    { background: linear-gradient(150deg, var(--primary-dark), var(--primary)); color: #fff; box-shadow: 0 8px 18px rgba(13,148,136,.28); }
-.btn-pri:hover { box-shadow: 0 10px 22px rgba(13,148,136,.36); filter: brightness(1.04); }
-.btn-pri:disabled { background: #A7D3CE; box-shadow: none; cursor: not-allowed; }
+/* Isian rata --primary-dark, bukan gradien. Gradien lama berjalan dari
+   5.5:1 di ujung gelap ke 3.7:1 di ujung terang — teks putih 13px gagal
+   AA di separuh tombolnya sendiri. Rata = satu nilai kontras, 5.5:1. */
+.btn-pri    { background: var(--primary-dark); color: var(--on-accent); }
+.btn-pri:hover { background: var(--primary-darker); }
+.btn-pri:disabled { background: var(--primary-off); cursor: not-allowed; }
 .btn-ghost  { background: var(--surface); border-color: var(--line-strong); color: var(--ink); }
-.btn-ghost:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-soft); }
-.btn-ok     { background: var(--ok); color: #fff; }
-.btn-ok:hover { filter: brightness(.94); }
-.btn-danger { background: var(--surface); border-color: var(--danger-line); color: var(--danger); }
+.btn-ghost:hover { border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-soft); }
+.btn-ok     { background: var(--ok); color: var(--on-accent); }
+.btn-ok:hover { background: var(--ok-2); }
+.btn-danger { background: var(--surface); border-color: var(--danger-line); color: var(--danger-2); }
 .btn-danger:hover { background: var(--danger-bg); }
 .btn-sm { padding: 7px 11px; font-size: 12px; }
 
 /* ---------- FORM ---------- */
 .field { margin-bottom: 14px; }
-.field label { display: block; font-size: 12.5px; font-weight: 700; color: #334155; margin-bottom: 6px; }
+.field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; }
 .field .help { color: var(--muted); font-weight: 400; font-size: 11.5px; margin-top: 3px; display: block; }
 /* Pesan validasi inline di bawah isian — pengganti toast untuk error form. */
 .field .err  { color: var(--danger); font-weight: 600; font-size: 11.5px; margin-top: 3px; display: block; }
@@ -593,13 +642,15 @@ select.inp {
   width: 100%; border: 1.5px solid var(--line-strong);
   border-radius: var(--radius); padding: 10px 13px; background: var(--surface);
   font-size: 14px; font-family: inherit; color: var(--ink);
-  transition: border-color .15s, box-shadow .15s;
+  /* Sengaja TANPA transisi: border + cincin adalah penanda fokus, dan
+     penanda fokus tidak boleh memudar masuk — pengguna papan ketik
+     kehilangan petunjuk posisi selama animasi berjalan. */
 }
 input:focus, textarea:focus, select.inp:focus {
-  border-color: var(--primary); outline: none;
+  border-color: var(--primary-dark); outline: none;
   box-shadow: 0 0 0 3px var(--primary-soft);
 }
-input::placeholder, textarea::placeholder { color: #9FAFB2; }
+input::placeholder, textarea::placeholder { color: var(--muted); }
 input[disabled], input[readonly] {
   background: var(--surface-2); color: var(--muted); cursor: not-allowed;
 }
@@ -620,20 +671,20 @@ input[type=checkbox] {
 .fdrop {
   border: 1.5px dashed var(--line-strong); border-radius: var(--radius);
   background: var(--surface-2); padding: 14px; cursor: pointer;
-  transition: border-color .15s, background .15s;
+  transition: border-color var(--dur-2) var(--ease-out), background-color var(--dur-2) var(--ease-out);
 }
 .fdrop:hover { border-color: var(--primary); background: var(--primary-soft); }
 .fdrop.over  { border-color: var(--primary); background: var(--primary-soft); border-style: solid; }
 .fdrop.has   { border-style: solid; border-color: var(--line-strong); background: var(--surface); }
 .fdrop-in { display: flex; align-items: center; gap: 12px; }
 .fdrop-ic {
-  width: 34px; height: 34px; border-radius: 9px; flex: 0 0 auto;
+  width: 34px; height: 34px; border-radius: var(--radius-xs); flex: 0 0 auto;
   display: grid; place-items: center;
-  background: var(--surface); border: 1px solid var(--line); color: var(--primary);
+  background: var(--surface); border: 1px solid var(--line); color: var(--primary-dark);
 }
 .fdrop-thumb {
-  width: 40px; height: 40px; flex: 0 0 auto; border-radius: 8px;
-  border: 1px solid var(--line); background: #fff; object-fit: contain; padding: 3px;
+  width: 40px; height: 40px; flex: 0 0 auto; border-radius: var(--radius-xs);
+  border: 1px solid var(--line); background: var(--surface); object-fit: contain; padding: 3px;
 }
 .fdrop-txt { min-width: 0; flex: 1; font-size: 13px; color: var(--muted); line-height: 1.45; }
 .fdrop-txt b {
@@ -663,37 +714,40 @@ select.inp {
   width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
   border: 1.5px solid var(--line-strong); border-radius: var(--radius);
   padding: 10px 13px; background: var(--surface); font-size: 14px; font-family: inherit;
-  color: var(--ink); cursor: pointer; text-align: left; transition: border-color .15s, box-shadow .15s;
+  color: var(--ink); cursor: pointer; text-align: left;
+  /* Tanpa transisi — border/cincin di sini adalah penanda fokus. */
 }
-.ss-btn.ss-open, .ss-btn:hover { border-color: var(--primary); }
+.ss-btn.ss-open, .ss-btn:hover { border-color: var(--primary-dark); }
 .ss-btn.ss-open { box-shadow: 0 0 0 3px var(--primary-soft); }
 .ss-btn > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ss-ph { color: #9FAFB2; }
-.ss-chev { color: var(--muted); flex: 0 0 auto; transition: transform .18s; font-size: 12px; }
+.ss-ph { color: var(--muted); }
+.ss-chev { color: var(--muted); flex: 0 0 auto; transition: transform var(--dur-2) var(--ease-out); font-size: 12px; }
 .ss-chev.flip { transform: rotate(180deg); }
 /* position:fixed + JS-set top/left/width so the panel is never clipped by a
-   scrollable modal/card. z-index above modal (50) and its overlay (40). */
+   scrollable modal/card. --z-popover duduk di atas modal (50) & overlay-nya
+   (40), tapi tetap di bawah modal konfirmasi (60) dan peringatan idle (70). */
 .ss-panel {
-  position: fixed; z-index: 2000;
+  position: fixed; z-index: var(--z-popover);
   background: var(--surface); border: 1px solid var(--line);
-  border-radius: 12px; box-shadow: var(--shadow-lg); overflow: hidden;
+  border-radius: var(--radius); box-shadow: var(--shadow-lg); overflow: hidden;
 }
 .ss-search-wrap { padding: 8px; border-bottom: 1px solid var(--line); }
 .ss-search {
-  width: 100%; border: 1.5px solid var(--line-strong); border-radius: 9px;
+  width: 100%; border: 1.5px solid var(--line-strong); border-radius: var(--radius-xs);
   padding: 8px 11px; font-size: 13px; font-family: inherit; outline: none;
 }
-.ss-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.ss-search:focus { border-color: var(--primary-dark); box-shadow: 0 0 0 3px var(--primary-soft); }
 .ss-opts { max-height: 240px; overflow-y: auto; padding: 6px; }
 .ss-opt {
-  padding: 9px 11px; border-radius: 9px; font-size: 13.5px; color: var(--ink); cursor: pointer;
+  padding: 9px 11px; border-radius: var(--radius-xs); font-size: 13.5px; color: var(--ink); cursor: pointer;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .ss-opt:hover { background: var(--surface-2); }
 .ss-opt.sel { background: var(--primary-soft); color: var(--primary-dark); font-weight: 700; }
+/* Kontrol nonaktif dikecualikan dari syarat kontras WCAG — --faint boleh. */
 .ss-opt.ss-disabled { color: var(--faint); cursor: not-allowed; opacity: .6; }
 .ss-opt.ss-disabled:hover { background: transparent; }
-.ss-empty { padding: 16px; text-align: center; color: var(--faint); font-size: 12.5px; }
+.ss-empty { padding: 16px; text-align: center; color: var(--muted); font-size: 12.5px; }
 
 /* ---------- PAGINATION ---------- */
 .pagination {
@@ -705,14 +759,15 @@ select.inp {
 .pagination li span {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 32px; height: 32px; padding: 0 8px;
-  border: 1px solid var(--line); border-radius: 9px;
+  border: 1px solid var(--line); border-radius: var(--radius-xs);
   font-size: 13px; font-weight: 500; color: var(--ink);
-  text-decoration: none; background: var(--surface); transition: .12s;
+  text-decoration: none; background: var(--surface);
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
-.pagination li a:hover { border-color: var(--primary); color: var(--primary-dark); background: var(--primary-soft); }
+.pagination li a:hover { border-color: var(--primary-dark); color: var(--primary-dark); background: var(--primary-soft); }
 .pagination li.active span {
-  background: var(--primary); border-color: var(--primary);
-  color: #fff; font-weight: 700;
+  background: var(--primary-dark); border-color: var(--primary-dark);
+  color: var(--on-accent); font-weight: 700;
 }
 .pagination li.disabled span { color: var(--faint); cursor: not-allowed; background: var(--surface-2); }
 
@@ -724,7 +779,7 @@ select.inp {
 }
 .meter > i {
   display: block; height: 100%; border-radius: 6px;
-  background: var(--ok); transition: width .4s ease;
+  background: var(--ok); transition: width var(--dur-3) var(--ease-out);
 }
 .meter.warn > i { background: var(--warn); }
 .meter.over > i { background: var(--danger); }
@@ -750,22 +805,25 @@ select.inp {
   font-size: 13px; display: flex;
   gap: 9px; align-items: flex-start; margin-top: 12px;
 }
-.notice.warn     { background: var(--warn-bg);      color: #92400E; border: 1px solid var(--warn-line); }
-.notice.info     { background: var(--primary-soft); color: var(--primary-dark); border: 1px solid #99D6CF; }
-.notice.ok-notice{ background: var(--ok-bg);         color: #166534; border: 1px solid var(--ok-line); }
+.notice.warn     { background: var(--warn-bg);      color: var(--warn-2); border: 1px solid var(--warn-line); }
+.notice.info     { background: var(--primary-soft); color: var(--primary-dark); border: 1px solid var(--primary-line); }
+.notice.ok-notice{ background: var(--ok-bg);         color: var(--ok-2); border: 1px solid var(--ok-line); }
 .notice.danger   { background: var(--danger-bg);     color: var(--danger-2); border: 1px solid var(--danger-line); }
-.notice .ic      { font-size: 15px; flex: 0 0 auto; line-height: 1.5; }
+.notice .ic      { flex: 0 0 auto; display: flex; align-items: center; height: 1.5em; }
+.notice .ic svg  { width: 16px; height: 16px; }
 
 .empty {
   text-align: center; padding: 54px 24px; color: var(--muted);
   display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
 .empty-ic {
-  width: 54px; height: 54px; border-radius: 15px;
+  width: 54px; height: 54px; border-radius: var(--radius-lg);
   background: var(--surface-2); border: 1px solid var(--line);
-  display: grid; place-items: center; font-size: 22px;
-  margin-bottom: 6px; opacity: .7;
+  display: grid; place-items: center;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
+.empty-ic svg { width: 24px; height: 24px; }
 .empty b { display: block; color: var(--ink); font-size: 14.5px; margin-bottom: 2px; }
 .empty p { font-size: 12.5px; margin: 0; max-width: 260px; }
 
@@ -779,10 +837,12 @@ select.inp {
   height: 22px; background: var(--surface-2);
   border-radius: 6px; overflow: hidden; border: 1px solid var(--line);
 }
+/* Isian rata, bukan gradien: pada batang data, panjang harus jadi satu-satunya
+   variabel yang dibaca mata — gradien menambah variabel kedua yang tak berarti. */
 .bar-track > i {
   display: block; height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  border-radius: 6px; transition: width .5s;
+  background: var(--primary-dark);
+  border-radius: 6px; transition: width var(--dur-3) var(--ease-out);
 }
 .bar-val { font-family: var(--mono); font-size: 12px; text-align: right; color: var(--ink); }
 
@@ -802,38 +862,38 @@ select.inp {
 /* ---------- TOAST ---------- */
 #toasts {
   position: fixed; top: 20px; right: 20px;
-  display: flex; flex-direction: column; gap: 10px; z-index: 100;
+  display: flex; flex-direction: column; gap: 10px; z-index: var(--z-toast);
 }
 /* Mobile: bentang di atas layar agar mudah dibaca & tidak terpotong */
 @media (max-width: 560px) {
   #toasts { top: 12px; right: 12px; left: 12px; }
   #toasts .toast { max-width: none; }
 }
+/* Status dibawa oleh lingkaran ikon berwarna, bukan garis tebal di tepi kiri.
+   Border tipis mengelilingi seluruh sisi. */
 .toast {
   background: var(--surface); color: var(--ink);
-  padding: 13px 18px 13px 14px; border-radius: 14px;
+  padding: 13px 18px 13px 14px; border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--line); border-left: 4px solid var(--primary);
+  border: 1px solid var(--line);
   font-size: 13.5px; font-weight: 600; display: flex; gap: 10px; align-items: center;
-  animation: toastIn .22s ease; max-width: 360px;
+  animation: toastIn var(--dur-3) var(--ease-out); max-width: 360px;
 }
-.toast.ok   { border-left-color: var(--ok); }
-.toast.warn { border-left-color: var(--warn); }
-.toast.err  { border-left-color: var(--danger); }
-.toast.info { border-left-color: var(--primary); }
 .toast .toast-ic {
   flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%;
-  display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff;
+  display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--on-accent);
+  background: var(--primary-dark);
 }
 .toast.ok   .toast-ic { background: var(--ok); }
 .toast.warn .toast-ic { background: var(--warn); }
 .toast.err  .toast-ic { background: var(--danger); }
-.toast.info .toast-ic { background: var(--primary); }
+.toast.info .toast-ic { background: var(--primary-dark); }
 .toast .toast-msg { flex: 1 1 auto; min-width: 0; }
 .toast .toast-x {
   flex: 0 0 auto; background: none; border: none; cursor: pointer;
   color: var(--muted); font-size: 12px; line-height: 1; padding: 2px 4px;
-  border-radius: 6px; transition: .12s;
+  border-radius: 6px;
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .toast .toast-x:hover { background: var(--surface-2); color: var(--ink); }
 @keyframes toastIn  { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
@@ -842,13 +902,13 @@ select.inp {
 /* ---------- CONFIRM MODAL ---------- */
 #confirm-modal[hidden] { display: none !important; }
 /* Di atas modal halaman (overlay 40 / modal 50) agar konfirmasi selalu terlihat. */
-#confirm-modal .modal-overlay { z-index: 60; }
-#confirm-modal .modal { z-index: 61; max-width: 440px; }
+#confirm-modal .modal-overlay { z-index: var(--z-confirm); }
+#confirm-modal .modal { z-index: calc(var(--z-confirm) + 1); max-width: 440px; }
 #confirm-modal .cf-msg { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 
 /* ---------- PASSWORD METER ---------- */
 .pw-meter { height: 4px; border-radius: 4px; background: var(--line); margin-top: 7px; overflow: hidden; }
-.pw-meter > span { display: block; height: 100%; width: 0; border-radius: 4px; transition: width .2s, background .2s; }
+.pw-meter > span { display: block; height: 100%; width: 0; border-radius: 4px; transition: width var(--dur-3) var(--ease-out), background-color var(--dur-3) var(--ease-out); }
 .pw-hint { margin-top: 4px; font-size: 11.5px; }
 
 /* ---------- CHART (SVG server-rendered) ---------- */
@@ -859,8 +919,8 @@ select.inp {
 /* ---------- IDLE WARNING ---------- */
 /* Peringatan idle — paling atas dari semua lapisan (termasuk modal konfirmasi). */
 #idle-warning[hidden] { display: none !important; }
-#idle-warning .modal-overlay { z-index: 70; }
-#idle-warning .modal { z-index: 71; max-width: 440px; }
+#idle-warning .modal-overlay { z-index: var(--z-idle); }
+#idle-warning .modal { z-index: calc(var(--z-idle) + 1); max-width: 440px; }
 #idle-warning .cf-msg { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 
 /* ---------- MODAL ---------- */
@@ -868,8 +928,8 @@ select.inp {
   position: fixed; inset: 0;
   background: rgba(15,23,42,.45);
   backdrop-filter: blur(2px);
-  z-index: 40; display: none;
-  animation: fadeIn .18s ease;
+  z-index: var(--z-overlay); display: none;
+  animation: fadeIn var(--dur-2) var(--ease-out);
 }
 .modal {
   position: fixed; top: 50%; left: 50%;
@@ -877,10 +937,10 @@ select.inp {
   background: var(--surface);
   border-radius: var(--radius-xl);
   box-shadow: 0 24px 60px rgba(15,23,42,.3);
-  z-index: 50; width: 100%; max-width: 560px;
+  z-index: var(--z-panel); width: 100%; max-width: 560px;
   max-height: 82vh;
   display: none; flex-direction: column; overflow: hidden;
-  animation: slideUp .2s ease;
+  animation: slideUp var(--dur-3) var(--ease-out);
 }
 .modal-head {
   padding: 20px 24px; border-bottom: 1px solid var(--line);
@@ -889,8 +949,9 @@ select.inp {
 .modal-head h3        { font-size: 18px; font-weight: 800; flex: 1; }
 .modal-head .close-btn{
   background: none; border: none; font-size: 18px;
-  cursor: pointer; color: var(--muted); padding: 4px 6px; border-radius: 8px;
-  transition: .12s;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted); padding: 4px 6px; border-radius: var(--radius-xs);
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .modal-head .close-btn:hover { background: var(--surface-2); color: var(--ink); }
 .modal-body { padding: 22px 24px; overflow-y: auto; flex: 1; }
@@ -908,34 +969,34 @@ select.inp {
 .tab-item {
   padding: 8px 15px; font-size: 13px; font-weight: 600;
   text-decoration: none; color: var(--muted);
-  border-right: 1px solid var(--line); transition: .12s;
-  white-space: nowrap;
+  border-right: 1px solid var(--line); white-space: nowrap;
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .tab-item:last-child { border-right: none; }
 .tab-item:hover { background: var(--surface-2); color: var(--ink); }
-.tab-item.active { background: var(--primary); color: #fff; }
+.tab-item.active { background: var(--primary-dark); color: var(--on-accent); }
 
 /* ---------- LOADING BAR ---------- */
 #pg-loading {
-  position: fixed; top: 0; left: 0; z-index: 9999;
-  height: 3px; background: var(--primary);
-  width: 0; transition: width .3s ease, opacity .4s ease;
+  position: fixed; top: 0; left: 0; z-index: var(--z-loading);
+  height: 3px; background: var(--primary-dark);
+  width: 0; transition: width var(--dur-3) var(--ease-out), opacity var(--dur-3) var(--ease-out);
   pointer-events: none; opacity: 0;
 }
-#pg-loading.run { width: 75%; opacity: 1; transition: width 8s cubic-bezier(.1,1,.7,1), opacity .1s; }
+/* Kurva panjang yang melambat sendiri: bilah merayap ke 75% selama permintaan
+   berjalan, lalu ui-shell menutupnya ke 100%. Bukan --dur-*, ini memang lama. */
+#pg-loading.run { width: 75%; opacity: 1; transition: width 8s cubic-bezier(.1,1,.7,1), opacity var(--dur-1) linear; }
 
 /* ---------- ANIMATIONS ---------- */
 @keyframes fadeIn  { from { opacity: 0; }                       to { opacity: 1; } }
-@keyframes slideIn { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes slideUp { from { transform: translate(-50%, -44%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
-@keyframes fadeUp  { from { opacity: 0; transform: translateY(8px); }  to { opacity: 1; transform: none; } }
-
-.card  { animation: fadeUp .22s ease both; }
-.stat  { animation: fadeUp .22s ease both; }
-.stat:nth-child(2) { animation-delay: .04s; }
-.stat:nth-child(3) { animation-delay: .08s; }
-.stat:nth-child(4) { animation-delay: .12s; }
-.notice { animation: fadeUp .2s ease both; }
+/* Tidak ada animasi masuk untuk .card / .stat / .notice.
+   Ini aplikasi multi-halaman yang dirender server: setiap klik menu adalah
+   muat halaman penuh, jadi gelombang fade-up berundak itu terputar ULANG
+   di SETIAP perpindahan halaman — sepanjang hari, bagi petugas yang memang
+   berpindah halaman terus-menerus. Konten yang sudah ada tidak perlu
+   memperkenalkan dirinya. Animasi disimpan untuk hal yang benar-benar
+   berubah keadaan: modal, toast, laci sidebar. */
 
 /* ---------- RESPONSIVE ---------- */
 
@@ -944,14 +1005,15 @@ select.inp {
   /* App shell: sidebar becomes overlay */
   .app.show { grid-template-columns: 1fr !important; --sb-w: 250px; }
   .sidebar {
-    position: fixed; left: -262px; top: 0; bottom: 0; z-index: 50;
+    position: fixed; left: -262px; top: 0; bottom: 0; z-index: var(--z-panel);
     height: 100vh; width: 250px !important;
-    transition: left .25s ease; box-shadow: none;
+    transition: left var(--dur-3) var(--ease-out); box-shadow: none;
   }
   .app.sb-open .sidebar { left: 0; box-shadow: 4px 0 24px rgba(15,23,42,.12); }
   .sb-backdrop {
     display: none; position: fixed; inset: 0;
-    background: rgba(15,23,42,.45); z-index: 49; animation: fadeIn .2s ease;
+    background: rgba(15,23,42,.45);
+    z-index: calc(var(--z-panel) - 1); animation: fadeIn var(--dur-3) var(--ease-out);
   }
   .app.sb-open .sb-backdrop { display: block; }
   .app.sb-open .nav-text    { display: block; }
@@ -1090,6 +1152,17 @@ select.inp {
   .sb-backdrop { display: none !important; }
 }
 
+/* Gerak spasial (geser/angkat) dimatikan; pudar singkat tetap boleh, karena
+   ia tidak memicu vestibular dan masih menandai "ada yang berubah". */
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .modal, .toast, .modal-overlay, .sb-backdrop {
+    animation: fadeIn 120ms linear !important;
+  }
+  .modal { transform: translate(-50%, -50%) !important; }
 }

@@ -28,12 +28,10 @@ use Illuminate\Support\Facades\Route;
 
 /* ─── Auth ─────────────────────────────────────────── */
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-// Rate limit per email+IP (limiter 'login' di AppServiceProvider) — anti brute force,
-// tanpa mengunci satu kantor yang berbagi IP. Melengkapi lockout per-akun.
 Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-/* ─── Lupa / Reset Kata Sandi (bawaan Password broker) ─────────── */
+/* ─── Lupa / Reset Kata Sandi */
 Route::get('/lupa-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('/lupa-password', [PasswordResetController::class, 'sendResetLink'])
     ->middleware('throttle:5,1')->name('password.email');
@@ -47,10 +45,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /* Keep-alive — menyegarkan waktu aktivitas sesi selama pengguna aktif di halaman */
+    /* Keep-alive */
     Route::get('/sesi/ping', fn () => response()->noContent())->name('session.ping');
 
-    /* Pencarian global — semua pengguna terautentikasi (hasil dibatasi role) */
+    /* Pencarian global — */
     Route::get('/cari', [SearchController::class, 'index'])->name('search.index');
 
     /* Profil / Pengaturan Akun — semua pengguna terautentikasi */
@@ -58,8 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
     Route::put('/profil/password', [ProfilController::class, 'updatePassword'])->name('profil.password');
 
-    /* Notifikasi — semua pengguna terautentikasi.
-       Rute statis (hitung/baca-semua) HARUS sebelum wildcard {notifikasi}. */
+    /* Notifikasi */
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
     Route::get('/notifikasi/hitung', [NotifikasiController::class, 'count'])->name('notifikasi.count');
     Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'readAll'])->name('notifikasi.readAll');
@@ -67,8 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/notifikasi/{notifikasi}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::get('/notifikasi/{notifikasi}', [NotifikasiController::class, 'read'])->name('notifikasi.read');
 
-    /* Barang — lihat: semua kecuali Kepala Bidang (menunya memang dihapus);
-       Admin CRUD penuh, Kasubag boleh edit */
+    /* Barang — lihat:*/
     Route::middleware('role:admin,petugas_gudang,kasubag_umum,pimpinan')->group(function () {
         Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
     });
@@ -109,10 +105,10 @@ Route::middleware('auth')->group(function () {
 
     /* Barang Masuk & Stock Opname — Admin & Gudang */
     Route::middleware('role:admin,petugas_gudang')->group(function () {
-        // Rute ekspor didaftarkan sebelum resource agar tidak tertelan wildcard {id}.
+        
         Route::get('/barang-masuk/export/{format}', [BarangMasukController::class, 'export'])->name('barang-masuk.export');
         Route::get('/stock-opname/{stock_opname}/export', [StockOpnameController::class, 'export'])->name('stock-opname.export');
-        // Hapus per-baris didaftarkan sebelum resource agar tidak tertelan wildcard.
+        
         Route::delete('/barang-masuk/{barang_masuk}/detail/{detail}', [BarangMasukController::class, 'destroyDetail'])->name('barang-masuk.destroy-detail');
         Route::resource('barang-masuk', BarangMasukController::class)->only(['index', 'store', 'show', 'destroy']);
         Route::resource('stock-opname', StockOpnameController::class)->only(['index', 'store', 'show']);

@@ -53,7 +53,7 @@
             <div class="notif-empty">Tidak ada notifikasi baru.</div>
           @endforelse
         </div>
-        <a href="{{ route('notifikasi.index') }}" class="notif-foot">Lihat semua notifikasi →</a>
+        <a href="{{ route('notifikasi.index') }}" class="notif-foot">Lihat semua notifikasi <x-icon name="arrow-right" width="13" height="13" style="vertical-align:-2px" /></a>
       </div>
     </div>
 

@@ -15,7 +15,7 @@
             <span class="code" style="font-size:15px">{{ $permintaan->request_no }}</span>
             <x-status-badge :status="$permintaan->status" />
             @if($permintaan->is_flagged)
-              <span class="badge b-danger">⚠ Over-Request</span>
+              <span class="badge b-danger"><x-icon name="alert" width="11" height="11" style="vertical-align:-1px" /> Over-Request</span>
             @endif
           </div>
           <div class="t-sub">Pengaju: <b>{{ $permintaan->requester->name }}</b> · {{ $permintaan->department->name }}</div>
@@ -28,27 +28,27 @@
         {{-- Aksi Kasubag --}}
         @if($permintaan->status === 'pending' && in_array($user->role, ['kasubag_umum','admin']))
           <div style="display:flex;gap:8px">
-            <button class="btn btn-danger btn-sm" @click="showReject=true">✕ Tolak</button>
-            <button type="submit" form="form-approve" class="btn btn-ok btn-sm">✓ Setujui</button>
+            <button class="btn btn-danger btn-sm" @click="showReject=true"><x-icon name="x" width="13" height="13" /> Tolak</button>
+            <button type="submit" form="form-approve" class="btn btn-ok btn-sm"><x-icon name="check" width="13" height="13" /> Setujui</button>
           </div>
         @endif
       </div>
 
       @if($permintaan->justification)
         <div class="notice info" style="margin-top:10px">
-          <span class="ic">ℹ</span>
+          <span class="ic"><x-icon name="info" /></span>
           <div><b>Justifikasi pengaju:</b> {{ $permintaan->justification }}</div>
         </div>
       @endif
       @if($permintaan->rejection_reason)
         <div class="notice warn" style="margin-top:10px">
-          <span class="ic">⚠</span>
+          <span class="ic"><x-icon name="alert" /></span>
           <div><b>Alasan penolakan:</b> {{ $permintaan->rejection_reason }}</div>
         </div>
       @endif
       @if($permintaan->note)
         <div class="notice info" style="margin-top:10px">
-          <span class="ic">•</span>
+          <span class="ic"><x-icon name="dot" /></span>
           <div>{{ $permintaan->note }}</div>
         </div>
       @endif
@@ -135,7 +135,7 @@
         <div class="modal" style="display:flex">
           <div class="modal-head">
             <h3>Tolak Permintaan {{ $permintaan->request_no }}</h3>
-            <button class="close-btn" @click="showReject=false">✕</button>
+            <button class="close-btn" @click="showReject=false"><x-icon name="x" width="16" height="16" /></button>
           </div>
           <div class="modal-body">
             <form method="POST" action="{{ route('permintaan.reject', $permintaan) }}">
@@ -156,9 +156,9 @@
   @endif
 
   <div style="margin-top:16px">
-    <a href="{{ route('permintaan.index') }}" class="btn btn-ghost">← Kembali</a>
+    <a href="{{ route('permintaan.index') }}" class="btn btn-ghost"><x-icon name="arrow-left" width="13" height="13" style="vertical-align:-2px" /> Kembali</a>
     @if($permintaan->status === 'disetujui' && in_array($user->role, ['petugas_gudang','admin']))
-      <a href="{{ route('distribusi.index', ['proses' => $permintaan->id]) }}" class="btn btn-pri" style="margin-left:8px">Proses Distribusi →</a>
+      <a href="{{ route('distribusi.index', ['proses' => $permintaan->id]) }}" class="btn btn-pri" style="margin-left:8px">Proses Distribusi <x-icon name="arrow-right" width="14" height="14" style="vertical-align:-2px" /></a>
     @endif
   </div>
 

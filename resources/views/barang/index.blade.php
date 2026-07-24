@@ -57,7 +57,7 @@
     <span class="filter-spacer"></span>
 
     @if(request()->hasAny(['search','category','status']))
-      <a href="{{ route('barang.index') }}" class="btn btn-ghost btn-sm">✕ Reset</a>
+      <a href="{{ route('barang.index') }}" class="btn btn-ghost btn-sm"><x-icon name="x" width="13" height="13" /> Reset</a>
     @endif
   </form>
 
@@ -104,7 +104,10 @@
                       ]) }}">Edit</button>
                     @if($isAdmin)
                       <form method="POST" action="{{ route('barang.destroy', $item) }}" style="display:inline"
-                            data-confirm="Hapus barang {{ $item->name }}? Tindakan ini tidak dapat dibatalkan."
+                            {{-- Item memakai SoftDeletes: barang dipindahkan ke Sampah, bukan
+                                 dimusnahkan. Teks lama berbunyi "tidak dapat dibatalkan" —
+                                 itu keliru, dan membuat orang takut memakai tombolnya. --}}
+                            data-confirm="Hapus barang {{ $item->name }}? Barang dipindahkan ke Sampah dan masih bisa dipulihkan dari sana."
                             data-confirm-variant="danger" data-confirm-ok="Hapus">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-sm" style="margin-left:4px">Hapus</button>
@@ -125,7 +128,7 @@
         </div>
       @else
         <div class="empty">
-          <div class="empty-ic">☷</div>
+          <div class="empty-ic"><x-icon name="rows" /></div>
           <b>Tidak ada barang ditemukan</b>
           <p>Coba ubah kata kunci pencarian atau reset filter.</p>
         </div>
@@ -141,7 +144,7 @@
         <div class="modal" style="display:flex">
           <div class="modal-head">
             <h3 x-text="editData.id ? 'Edit Barang' : 'Tambah Barang'"></h3>
-            <button class="close-btn" @click="showModal=false">✕</button>
+            <button class="close-btn" @click="showModal=false"><x-icon name="x" width="16" height="16" /></button>
           </div>
           <div class="modal-body">
             <form :action="editData.id ? '/barang/'+editData.id : '/barang'" method="POST">

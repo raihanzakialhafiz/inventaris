@@ -35,7 +35,7 @@
                 <td class="t-sub">{{ $req->requester->name }}</td>
                 <td class="num">{{ $req->details->count() }}</td>
                 <td class="t-sub">{{ $req->approved_date?->isoFormat('D MMM Y') }}</td>
-                <td><button type="button" class="btn btn-pri btn-sm" @click="openId = {{ $req->id }}">Proses →</button></td>
+                <td><button type="button" class="btn btn-pri btn-sm" @click="openId = {{ $req->id }}">Proses <x-icon name="arrow-right" width="13" height="13" style="vertical-align:-2px" /></button></td>
               </tr>
             @endforeach
           </tbody>
@@ -50,7 +50,7 @@
     </div>
   @else
     <div class="notice info" style="margin-bottom:16px">
-      <span class="ic">✓</span>
+      <span class="ic"><x-icon name="check-circle" /></span>
       <div>Tidak ada permintaan yang menunggu distribusi.</div>
     </div>
   @endif
@@ -93,7 +93,7 @@
         </div>
       @else
         <div class="empty">
-          <div class="empty-ic">↑</div>
+          <div class="empty-ic"><x-icon name="send-up" /></div>
           <b>Belum ada distribusi</b>
           <p>Riwayat distribusi barang akan muncul di sini setelah permintaan diproses.</p>
         </div>
@@ -109,12 +109,12 @@
         <div class="modal" style="display:flex;max-width:760px">
           <div class="modal-head">
             <h3>Proses Distribusi · {{ $req->request_no }}</h3>
-            <button type="button" class="close-btn" @click="openId = null">✕</button>
+            <button type="button" class="close-btn" @click="openId = null"><x-icon name="x" width="16" height="16" /></button>
           </div>
 
           <div class="modal-body">
             <div class="notice info" style="margin:0 0 14px">
-              <span class="ic">ℹ</span>
+              <span class="ic"><x-icon name="info" /></span>
               <div>
                 <b>{{ $req->requester->name }}</b> · {{ $req->department->name }}.
                 Kurangi jumlah distribusi jika stok tidak mencukupi (wajib isi alasan).
@@ -166,7 +166,7 @@
 
           <div class="modal-foot">
             <button type="button" class="btn btn-ghost" @click="openId = null">Batal</button>
-            <button type="submit" form="dist-form-{{ $req->id }}" class="btn btn-pri">✓ Proses Distribusi</button>
+            <button type="submit" form="dist-form-{{ $req->id }}" class="btn btn-pri"><x-icon name="check" width="14" height="14" /> Proses Distribusi</button>
           </div>
         </div>
       </div>

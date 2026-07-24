@@ -68,7 +68,7 @@
       @endif
     @else
       <div class="empty">
-        <div class="empty-ic">🗑️</div>
+        <div class="empty-ic"><x-icon name="trash" /></div>
         <b>Kotak sampah kosong</b>
         <p>Data yang dihapus akan muncul di sini dan bisa dipulihkan dalam {{ $retention }} hari.</p>
       </div>
