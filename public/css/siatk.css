@@ -1,4 +1,7 @@
 /* Hallmark · audit-fix pass · 2026-07-23 · nada: utilitarian
+ * Hallmark · mobile-fix pass · 2026-07-28 — iOS-zoom (input 16px @≤576),
+ *   target sentuh ≥40–44px (@pointer:coarse), overflow-x:clip di akar,
+ *   safe-area landscape, panel notifikasi/profil di-pin ke viewport di ponsel.
  *
  * BUKAN pembangunan ulang: makrostruktur, tata letak, dan alur halaman tidak
  * disentuh — jadi berkas ini sengaja TIDAK membawa cap `macrostructure:`.
@@ -93,7 +96,10 @@
 
 /* ---------- RESET ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+/* overflow-x: clip di akar sebagai jaring ganda — mencegah scroll horizontal
+   kalau ada anak yang meluber. clip (bukan hidden) tidak membuat scroll-
+   container, jadi topbar & sidebar sticky tetap bekerja. */
+html, body { margin: 0; padding: 0; overflow-x: clip; }
 body {
   font-family: var(--sans);
   background: var(--bg);
@@ -141,7 +147,7 @@ a { color: var(--primary-dark); }
   border-right: 1px solid var(--line);
   padding: 14px 12px;
   display: flex; flex-direction: column;
-  position: sticky; top: 0; height: 100vh; overflow: hidden;
+  position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden;
   width: var(--sb-w); transition: width var(--dur-3) var(--ease-out);
   flex: 0 0 auto;
 }
@@ -348,9 +354,9 @@ a { color: var(--primary-dark); }
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg); overflow: hidden;
 }
-/* 100vw disengaja: panel ini absolute di dalam .dd selebar 44px, jadi batasnya
-   memang harus viewport. Selisih lebar scrollbar hanya mengikat di lebar ponsel,
-   yang scrollbar-nya overlay (0px) — jadi aman. */
+/* Di desktop panel di-anchor ke tombol pemicu (absolute, right:0). Di ponsel
+   anchor itu bukan tepi kanan layar (tombol profil ada di sebelahnya), jadi
+   panel di-pin ulang ke viewport lewat @media (max-width: 576px) di bawah. */
 .notif-panel { width: 340px; max-width: calc(100vw - 32px); }
 .dd-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 12px; font-size: 14px; font-weight: 800; }
 .dd-count { font-size: 11px; font-weight: 700; color: var(--primary-dark); background: var(--primary-soft); padding: 2px 9px; border-radius: 20px; }
@@ -1037,7 +1043,7 @@ select.inp {
   .app.show { grid-template-columns: 1fr !important; --sb-w: 250px; }
   .sidebar {
     position: fixed; left: -262px; top: 0; bottom: 0; z-index: var(--z-panel);
-    height: 100vh; width: 250px !important;
+    height: 100vh; height: 100dvh; width: 250px !important;
     transition: left var(--dur-3) var(--ease-out); box-shadow: none;
   }
   .app.sb-open .sidebar { left: 0; box-shadow: 4px 0 24px rgba(15,23,42,.12); }
@@ -1160,12 +1166,30 @@ select.inp {
   .pagination li a,
   .pagination li span { min-width: 28px; height: 28px; font-size: 12px; padding: 0 5px; }
 
-  /* Modal – near full-width on phone */
-  .modal { width: calc(100vw - 20px); max-width: none; max-height: 90vh; }
+  /* Modal – near full-width on phone. 100% (bukan 100vw) supaya lebar scrollbar
+     tak ikut terhitung; .modal fixed, jadi 100% = lebar viewport. */
+  .modal { width: calc(100% - 20px); max-width: none; max-height: 90vh; }
   .modal-body { padding: 16px; }
 
   /* Bar chart */
   .bar-row { grid-template-columns: 72px 1fr 56px; gap: 8px; font-size: 12px; }
+
+  /* iOS men-zoom viewport saat fokus ke input ber-font-size < 16px, lalu tidak
+     mengembalikannya. Paksa 16px di ponsel untuk semua kolom isian — tingginya
+     sedikit bertambah, jadi target sentuhnya malah lebih baik. */
+  input[type=text], input[type=number], input[type=email], input[type=password],
+  input[type=date], input[type=month], input[type=search], input[type=tel],
+  textarea, select.inp,
+  .topbar-search input[type=search] { font-size: 16px; }
+
+  /* Panel dropdown (notifikasi & profil) di-pin ke viewport, bukan ke tombol
+     pemicunya yang sempit. Sebelumnya di-anchor right:0 ke ikon lonceng yang
+     bukan tepi kanan layar, sehingga sisi kirinya melewati tepi kiri viewport
+     dan terpotong oleh overflow-x:clip milik .main. */
+  .dd-panel { position: fixed; top: calc(var(--topbar-h) - 4px); right: 12px; left: auto; }
+  .notif-panel,
+  .profile-panel { width: min(360px, calc(100vw - 24px)); max-width: none; }
+  .notif-list { max-height: min(360px, 60dvh); }
 }
 
 /* ── Very small phones (≤ 400px) ── */
@@ -1178,9 +1202,178 @@ select.inp {
   .filter-bar input[type=date] { flex: 1 1 100%; }
 }
 
+/* ── Perangkat sentuh: ambang target ketuk ── */
+/* Lebar viewport tak selalu menandai perangkat sentuh; pointer:coarse ya.
+   Naikkan tombol kecil, ikon aksi, dan nomor pagination ke ambang nyaman jari
+   (≥40–44px) tanpa mengubah tampilannya di desktop bermouse. min-height selalu
+   menang atas height yang lebih kecil, jadi urutan sumber tak jadi soal. */
+@media (pointer: coarse) {
+  .btn, .btn-sm { min-height: 44px; }
+  .icon-btn, .icon-act, .topbar-toggle,
+  .modal-head .close-btn, .toast .toast-x { min-width: 44px; min-height: 44px; }
+  .dd-item, .tab-item, .notif-foot { min-height: 44px; }
+  .pagination li a, .pagination li span { min-width: 40px; min-height: 40px; }
+}
+
+/* ── Safe-area (poni & indikator layar penuh iOS, mode landscape) ── */
+/* env() = 0 di potret, jadi tak berpengaruh sampai ada poni di sisi layar.
+   Inset dipasang di .main (menggeser topbar + konten sekaligus) agar tidak
+   bertabrakan dengan padding kompak .content di tiap breakpoint. */
+@supports (padding: max(0px)) {
+  .main { padding-inline: env(safe-area-inset-left) env(safe-area-inset-right); }
+  .app.sb-open .sidebar { padding-left: max(12px, env(safe-area-inset-left)); }
+}
+
 /* ── Desktop only ── */
 @media (min-width: 861px) {
   .sb-backdrop { display: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOBILE UX v2 · 2026-07-28
+   Kartu tabel · judul topbar · aksi modal lengket · baris dashboard ·
+   tab bar bawah · filter ringkas. Semua aditif & di-gate ≤576px.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── #2 Topbar: judul halaman menggantikan dominasi search di ponsel ── */
+.topbar-title        { display: none; }
+.topbar-search-toggle{ display: none; }
+@media (max-width: 576px) {
+  .topbar-search        { display: none; }          /* search inline diciutkan */
+  .topbar-search-toggle { display: inline-flex; }   /* jadi ikon → halaman cari */
+  .topbar-title {
+    display: block; flex: 1 1 auto; min-width: 0; margin-left: 2px;
+  }
+  .topbar-title .page-title {
+    font-size: 15px; font-weight: 800; letter-spacing: -.2px; line-height: 1.15;
+    color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .topbar-title .crumb {
+    font-size: 11px; color: var(--muted); line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+}
+
+/* ── #1 Tabel padat → kartu (hanya tabel ber-.tbl-cards, selnya data-label) ── */
+@media (max-width: 576px) {
+  table.tbl-cards thead {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  table.tbl-cards,
+  table.tbl-cards tbody,
+  table.tbl-cards tr,
+  table.tbl-cards td { display: block; width: auto; }
+  .card-b > table.tbl-cards { min-width: 0; }       /* buang scroll horizontal */
+
+  table.tbl-cards tr {
+    background: var(--surface);                      /* matikan zebra */
+    border: 1px solid var(--line); border-radius: var(--radius);
+    margin: 10px; padding: 4px 0;
+  }
+  table.tbl-cards td {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 7px 14px; border: none; text-align: right; min-width: 0;
+  }
+  table.tbl-cards td::before {
+    content: attr(data-label); flex: 0 0 auto; text-align: left;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--muted);
+  }
+  table.tbl-cards td.cell-no { display: none; }      /* nomor urut tak berarti */
+  table.tbl-cards td.cell-title {
+    justify-content: flex-start; text-align: left;
+    font-size: 15px; font-weight: 700; color: var(--ink);
+    padding-top: 11px; padding-bottom: 3px;
+  }
+  table.tbl-cards td.cell-title::before { content: none; }
+  table.tbl-cards td.cell-actions {
+    justify-content: stretch; gap: 8px; text-align: left;
+    margin-top: 6px; padding: 10px 12px 12px;
+    border-top: 1px solid var(--line-soft);
+  }
+  table.tbl-cards td.cell-actions::before { content: none; }
+  table.tbl-cards td.cell-actions .act-group { display: flex; gap: 8px; width: 100%; }
+  table.tbl-cards td.cell-actions .act-group .icon-act { flex: 1; }
+  table.tbl-cards td.cell-actions .btn { flex: 1; justify-content: center; }
+  table.tbl-cards td.cell-actions form { flex: 1; display: flex; margin: 0; }
+  table.tbl-cards td.cell-actions form .btn { width: 100%; margin: 0; }
+}
+
+/* ── #3 Aksi modal: lengket di dasar body + full-width di ponsel ── */
+.modal-actions {
+  position: sticky; bottom: 0; z-index: 1;
+  display: flex; gap: 10px; justify-content: flex-end; align-items: center;
+  margin: 18px -24px -22px; padding: 14px 24px;
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+@media (max-width: 576px) {
+  .modal-actions { margin: 16px -16px -16px; padding: 12px 16px; }
+  .modal-actions .btn { flex: 1; justify-content: center; }
+  .modal-foot { padding: 12px 16px; }
+  .modal-foot .btn { flex: 1; justify-content: center; }
+}
+
+/* ── #4 Baris ringkas dashboard: menumpuk rapi di ponsel ── */
+.mini-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 18px; border-bottom: 1px solid var(--line);
+}
+.mini-row:last-child { border-bottom: none; }
+.mini-row__id   { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.mini-row__name { flex: 1; min-width: 0; }
+.mini-row__meta { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+@media (max-width: 576px) {
+  .mini-row { flex-wrap: wrap; }
+  .mini-row__id   { flex: 1 1 100%; }
+  .mini-row__meta { flex: 1 1 100%; justify-content: flex-start; }
+  .mini-row__meta .btn { margin-left: auto; }
+}
+
+/* ── #8 Tab bar bawah — navigasi cepat di zona ibu jari ── */
+.bottomnav { display: none; }
+@media (max-width: 576px) {
+  .bottomnav {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-sticky);
+    background: var(--surface); border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .bottomnav a,
+  .bottomnav .bn-menu {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 8px 4px 7px; min-height: 54px; position: relative;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); text-decoration: none;
+    font-size: 10.5px; font-weight: 600; font-family: inherit;
+  }
+  .bottomnav .bn-ic { display: flex; }
+  .bottomnav a.active { color: var(--primary-dark); }
+  .bottomnav a.active::after {
+    content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 30px; height: 2.5px; border-radius: 0 0 3px 3px; background: var(--primary-dark);
+  }
+  .bottomnav .bn-badge {
+    position: absolute; top: 4px; left: calc(50% + 6px);
+    min-width: 15px; height: 15px; padding: 0 4px;
+    background: var(--danger-2); color: var(--on-accent);
+    font-size: 9.5px; font-weight: 700; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface);
+  }
+  .bottomnav .bn-badge[hidden] { display: none; }
+  /* Ruang agar konten & pagination tak tertutup bar bawah */
+  .content { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+}
+
+/* ── #5 Filter ringkas: kontrol lanjutan di balik toggle "Filter" ── */
+/* display:contents di desktop → pembungkus transparan, select tetap sejajar.
+   Di ponsel ia jadi baris tersembunyi yang muncul saat .is-open. */
+.filter-adv    { display: contents; }
+.filter-toggle { display: none; }
+@media (max-width: 576px) {
+  .filter-toggle { display: inline-flex; flex: 0 0 auto; }
+  .filter-adv    { display: none; }
+  .filter-bar.is-open .filter-adv { display: flex; flex: 1 1 100%; flex-wrap: wrap; gap: 6px; }
 }
 
 /* Gerak spasial (geser/angkat) dimatikan; pudar singkat tetap boleh, karena

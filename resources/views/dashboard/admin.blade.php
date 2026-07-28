@@ -75,19 +75,21 @@
             <div class="card-b" style="padding:6px 0">
                 @forelse($lowStock->merge($outStock) as $item)
                     @php $st = $item->stock <= 0 ? ['b-danger','Habis'] : ['b-warn','Menipis']; @endphp
-                    <div
-                        style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line)">
-                        <span class="code" style="flex:0 0 auto">{{ $item->code }}</span>
-                        <div style="flex:1;min-width:0">
-                            <div class="t-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                                {{ $item->name }}</div>
-                            <div class="t-sub">min {{ $item->minimum_stock }} {{ $item->unit }}</div>
+                    <div class="mini-row">
+                        <div class="mini-row__id">
+                            <span class="code" style="flex:0 0 auto">{{ $item->code }}</span>
+                            <div class="mini-row__name">
+                                <div class="t-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                                    {{ $item->name }}</div>
+                                <div class="t-sub">min {{ $item->minimum_stock }} {{ $item->unit }}</div>
+                            </div>
                         </div>
-                        <b
-                            style="{{ $item->stock <= 0 ? 'color:var(--danger)' : 'color:var(--warn)' }}">{{ $item->stock }}</b>
-                        <span class="badge {{ $st[0] }}">{{ $st[1] }}</span>
-                        <a href="{{ route('barang.index', ['search' => $item->code]) }}"
-                            class="btn btn-ghost btn-sm">Kelola</a>
+                        <div class="mini-row__meta">
+                            <b style="{{ $item->stock <= 0 ? 'color:var(--danger)' : 'color:var(--warn)' }}">{{ $item->stock }}</b>
+                            <span class="badge {{ $st[0] }}">{{ $st[1] }}</span>
+                            <a href="{{ route('barang.index', ['search' => $item->code]) }}"
+                                class="btn btn-ghost btn-sm">Kelola</a>
+                        </div>
                     </div>
                 @empty
                     <div class="empty" style="padding:32px 0">

@@ -35,7 +35,9 @@
     @endif
   </div>
 
-  <form method="GET" class="filter-bar">
+  <form method="GET" class="filter-bar"
+        x-data="{ advOpen: {{ request()->hasAny(['category','status']) ? 'true' : 'false' }} }"
+        :class="{ 'is-open': advOpen }">
     @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
     @if(request('dir'))<input type="hidden" name="dir" value="{{ request('dir') }}">@endif
 
@@ -43,15 +45,24 @@
            placeholder="Cari nama atau kode barang…"
            x-data @input.debounce.400ms="$el.form.submit()">
 
-    <div style="min-width:180px">
-      <x-searchable-select name="category" :options="$categories" :selected="request('category')"
-                           placeholder="Semua Kategori" search-placeholder="Cari kategori…" :submit-on-change="true" />
-    </div>
+    {{-- Ponsel: tombol yang membuka/menutup kontrol filter lanjutan --}}
+    <button type="button" class="btn btn-ghost btn-sm filter-toggle" @click="advOpen = !advOpen"
+            :aria-expanded="advOpen ? 'true' : 'false'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+      Filter
+    </button>
 
-    <div style="min-width:160px">
-      <x-searchable-select name="status" :selected="request('status')"
-                           :options="['ok' => 'Stok Aman', 'low' => 'Stok Menipis', 'out' => 'Stok Habis']"
-                           placeholder="Semua Status" search-placeholder="Cari status…" :submit-on-change="true" />
+    <div class="filter-adv">
+      <div style="min-width:180px">
+        <x-searchable-select name="category" :options="$categories" :selected="request('category')"
+                             placeholder="Semua Kategori" search-placeholder="Cari kategori…" :submit-on-change="true" />
+      </div>
+
+      <div style="min-width:160px">
+        <x-searchable-select name="status" :selected="request('status')"
+                             :options="['ok' => 'Stok Aman', 'low' => 'Stok Menipis', 'out' => 'Stok Habis']"
+                             placeholder="Semua Status" search-placeholder="Cari status…" :submit-on-change="true" />
+      </div>
     </div>
 
     <span class="filter-spacer"></span>
@@ -64,7 +75,7 @@
   <div class="card">
     <div class="card-b" style="padding:0">
       @if($items->count())
-        <table>
+        <table class="tbl-cards">
           <thead><tr>
             <th class="num">No</th>
             <x-sort-th col="code"          label="Kode" />
@@ -84,16 +95,16 @@
                   : ($item->stock <= $item->minimum_stock ? ['b-warn','Menipis'] : ['b-ok','Aman']);
               @endphp
               <tr>
-                <td class="num t-sub">{{ $items->firstItem() + $loop->index }}</td>
-                <td><span class="code">{{ $item->code }}</span></td>
-                <td class="t-name">{{ $item->name }}</td>
-                <td><span class="t-sub">{{ $item->category->name }}</span></td>
-                <td class="t-sub">{{ $item->location ?: '—' }}</td>
-                <td class="num"><b>{{ $item->stock }}</b> <span class="t-sub">{{ $item->unit }}</span></td>
-                <td class="num t-sub">{{ $item->minimum_stock }}</td>
-                <td><span class="badge {{ $st[0] }}">{{ $st[1] }}</span></td>
+                <td class="num t-sub cell-no">{{ $items->firstItem() + $loop->index }}</td>
+                <td data-label="Kode"><span class="code">{{ $item->code }}</span></td>
+                <td class="t-name cell-title">{{ $item->name }}</td>
+                <td data-label="Kategori"><span class="t-sub">{{ $item->category->name }}</span></td>
+                <td class="t-sub" data-label="Lokasi">{{ $item->location ?: '—' }}</td>
+                <td class="num" data-label="Stok"><b>{{ $item->stock }}</b> <span class="t-sub">{{ $item->unit }}</span></td>
+                <td class="num t-sub" data-label="Min Stok">{{ $item->minimum_stock }}</td>
+                <td data-label="Status"><span class="badge {{ $st[0] }}">{{ $st[1] }}</span></td>
                 @if($canEdit)
-                  <td style="white-space:nowrap">
+                  <td class="cell-actions" style="white-space:nowrap">
                     <button class="btn btn-ghost btn-sm"
                       @click="showModal=true; editData={{ json_encode([
                         'id' => $item->id, 'code' => $item->code, 'name' => $item->name,
@@ -203,7 +214,7 @@
                 </div>
               </div>
 
-              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+              <div class="modal-actions">
                 <button type="button" class="btn btn-ghost" @click="showModal=false">Batal</button>
                 <button type="submit" class="btn btn-pri">Simpan Barang</button>
               </div>

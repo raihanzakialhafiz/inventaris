@@ -116,7 +116,7 @@
         <div class="card">
             <div class="card-b" style="padding:0">
                 @if ($permintaan->count())
-                    <table>
+                    <table class="tbl-cards">
                         <thead>
                             <tr>
                                 <x-sort-th col="request_no" label="No. Permintaan" />
@@ -131,12 +131,12 @@
                         <tbody>
                             @foreach ($permintaan as $req)
                                 <tr>
-                                    <td><a href="#" @click.prevent="detailId = {{ $req->id }}" class="code"
+                                    <td class="cell-title"><a href="#" @click.prevent="detailId = {{ $req->id }}" class="code"
                                             style="cursor:pointer">{{ $req->request_no }}</a></td>
-                                    <td><span class="badge b-primary">{{ $req->department->code }}</span></td>
-                                    <td class="t-sub">{{ $req->requester->name }}</td>
-                                    <td>{{ $req->request_date->isoFormat('D MMM Y') }}</td>
-                                    <td>
+                                    <td data-label="Bidang"><span class="badge b-primary">{{ $req->department->code }}</span></td>
+                                    <td class="t-sub" data-label="Pengaju">{{ $req->requester->name }}</td>
+                                    <td data-label="Tanggal">{{ $req->request_date->isoFormat('D MMM Y') }}</td>
+                                    <td data-label="Flag">
                                         @if ($req->is_flagged)
                                             <span class="badge b-danger"><x-icon name="alert" width="11"
                                                     height="11" style="vertical-align:-1px" /> Over</span>
@@ -144,8 +144,8 @@
                                             <span class="t-sub">—</span>
                                         @endif
                                     </td>
-                                    <td><x-status-badge :status="$req->status" /></td>
-                                    <td>
+                                    <td data-label="Status"><x-status-badge :status="$req->status" /></td>
+                                    <td class="cell-actions">
                                         <div class="act-group">
                                             @if ($req->status === 'pending' && in_array($user->role, ['kasubag_umum', 'admin']))
                                                 {{-- Setujui (sesuai jumlah diminta) --}}
@@ -235,7 +235,7 @@
                                     <label>Alasan Penolakan <span style="color:var(--danger)">*</span></label>
                                     <textarea name="rejection_reason" rows="3" required minlength="5" placeholder="Minimal 5 karakter…"></textarea>
                                 </div>
-                                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+                                <div class="modal-actions">
                                     <button type="button" class="btn btn-ghost" @click="rejectOpen=false">Batal</button>
                                     <button type="submit" class="btn btn-danger">Tolak Permintaan</button>
                                 </div>
@@ -404,7 +404,7 @@
                                         placeholder="Jelaskan alasan permintaan melebihi batas kuota"></textarea>
                                 </div>
 
-                                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+                                <div class="modal-actions">
                                     <button type="button" class="btn btn-ghost" @click="showModal=false">Batal</button>
                                     <button type="submit" class="btn btn-pri" :disabled="isBlocked()"
                                         :style="isBlocked() ? 'opacity:.5;cursor:not-allowed' : ''">Kirim Permintaan <x-icon

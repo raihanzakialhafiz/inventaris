@@ -20,7 +20,7 @@
                     <span class="hint">{{ $approved->total() }} menunggu diproses</span>
                 </div>
                 <div class="card-b" style="padding:0">
-                    <table>
+                    <table class="tbl-cards">
                         <thead>
                             <tr>
                                 <th class="num">No</th>
@@ -35,14 +35,14 @@
                         <tbody>
                             @foreach ($approved as $req)
                                 <tr>
-                                    <td class="num t-sub">{{ $approved->firstItem() + $loop->index }}</td>
-                                    <td><span class="code">{{ $req->request_no }}</span></td>
-                                    <td><span class="badge b-primary">{{ $req->department->code }}</span>
+                                    <td class="num t-sub cell-no">{{ $approved->firstItem() + $loop->index }}</td>
+                                    <td class="cell-title"><span class="code">{{ $req->request_no }}</span></td>
+                                    <td data-label="Bidang"><span class="badge b-primary">{{ $req->department->code }}</span>
                                         {{ $req->department->name }}</td>
-                                    <td class="t-sub">{{ $req->requester->name }}</td>
-                                    <td class="num">{{ $req->details->count() }}</td>
-                                    <td class="t-sub">{{ $req->approved_date?->isoFormat('D MMM Y') }}</td>
-                                    <td><button type="button" class="btn btn-pri btn-sm"
+                                    <td class="t-sub" data-label="Pengaju">{{ $req->requester->name }}</td>
+                                    <td class="num" data-label="Jenis Barang">{{ $req->details->count() }}</td>
+                                    <td class="t-sub" data-label="Disetujui">{{ $req->approved_date?->isoFormat('D MMM Y') }}</td>
+                                    <td class="cell-actions"><button type="button" class="btn btn-pri btn-sm"
                                             @click="openId = {{ $req->id }}">Proses <x-icon name="arrow-right"
                                                 width="13" height="13" style="vertical-align:-2px" /></button></td>
                                 </tr>
@@ -71,7 +71,7 @@
             </div>
             <div class="card-b" style="padding:0">
                 @if ($history->count())
-                    <table>
+                    <table class="tbl-cards">
                         <thead>
                             <tr>
                                 <th class="num">No</th>
@@ -86,13 +86,13 @@
                         <tbody>
                             @foreach ($history as $so)
                                 <tr>
-                                    <td class="num t-sub">{{ $history->firstItem() + $loop->index }}</td>
-                                    <td><span class="code">{{ $so->transaction_no }}</span></td>
-                                    <td>{{ $so->item->name }}</td>
-                                    <td><span class="badge b-primary">{{ $so->department->code ?? '—' }}</span></td>
-                                    <td class="num">{{ $so->quantity }}</td>
-                                    <td>{{ $so->date->isoFormat('D MMM Y') }}</td>
-                                    <td>
+                                    <td class="num t-sub cell-no">{{ $history->firstItem() + $loop->index }}</td>
+                                    <td class="cell-title"><span class="code">{{ $so->transaction_no }}</span></td>
+                                    <td data-label="Barang">{{ $so->item->name }}</td>
+                                    <td data-label="Bidang"><span class="badge b-primary">{{ $so->department->code ?? '—' }}</span></td>
+                                    <td class="num" data-label="Jml">{{ $so->quantity }}</td>
+                                    <td data-label="Tanggal">{{ $so->date->isoFormat('D MMM Y') }}</td>
+                                    <td data-label="Ref.">
                                         @if ($so->request)
                                             <a href="{{ route('permintaan.show', $so->request) }}"
                                                 class="code">{{ $so->request->request_no }}</a>

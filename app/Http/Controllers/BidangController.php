@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreBidangRequest;
-use App\Http\Requests\UpdateBidangRequest;
+use App\Http\Requests\BidangRequest;
 use App\Models\Department;
 use App\Models\User;
 
@@ -16,13 +15,13 @@ class BidangController extends Controller
         return view('bidang.index', compact('bidang', 'kabiList'));
     }
 
-    public function store(StoreBidangRequest $request)
+    public function store(BidangRequest $request)
     {
         Department::create($request->validated());
         return back()->with('success', 'Bidang berhasil ditambahkan.');
     }
 
-    public function update(UpdateBidangRequest $request, Department $bidang)
+    public function update(BidangRequest $request, Department $bidang)
     {
         $bidang->update($request->validated());
         return back()->with('success', 'Bidang berhasil diperbarui.');

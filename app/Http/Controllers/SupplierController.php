@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreSupplierRequest;
-use App\Http\Requests\UpdateSupplierRequest;
+use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -29,13 +28,13 @@ class SupplierController extends Controller
         return view('supplier.index', compact('suppliers'));
     }
 
-    public function store(StoreSupplierRequest $request)
+    public function store(SupplierRequest $request)
     {
         Supplier::create($request->validated());
         return back()->with('success', 'Supplier berhasil ditambahkan.');
     }
 
-    public function update(UpdateSupplierRequest $request, Supplier $supplier)
+    public function update(SupplierRequest $request, Supplier $supplier)
     {
         $supplier->update($request->validated());
         return back()->with('success', 'Supplier berhasil diperbarui.');

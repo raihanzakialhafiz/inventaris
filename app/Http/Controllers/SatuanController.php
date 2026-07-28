@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreSatuanRequest;
-use App\Http\Requests\UpdateSatuanRequest;
+use App\Http\Requests\SatuanRequest;
 use App\Models\Item;
 use App\Models\Unit;
 
@@ -26,14 +25,14 @@ class SatuanController extends Controller
         return view('satuan.index', compact('satuan'));
     }
 
-    public function store(StoreSatuanRequest $request)
+    public function store(SatuanRequest $request)
     {
         Unit::create($request->validated());
 
         return back()->with('success', 'Satuan berhasil ditambahkan.');
     }
 
-    public function update(UpdateSatuanRequest $request, Unit $satuan)
+    public function update(SatuanRequest $request, Unit $satuan)
     {
         $satuan->update($request->validated());
 

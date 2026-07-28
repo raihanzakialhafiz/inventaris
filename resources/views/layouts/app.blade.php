@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>@yield('title', 'Dashboard') · {{ setting('app_name', 'SIIB') }}</title>
   @if(setting('favicon'))<link rel="icon" href="{{ asset('storage/'.setting('favicon')) }}">@endif
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,6 +31,9 @@
       @yield('content')
     </main>
   </div>
+
+  {{-- Tab bar bawah (ponsel) — di dalam .app agar bisa memanggil mobileOpen --}}
+  @include('partials.bottomnav')
 </div>
 
 <div id="toasts"></div>

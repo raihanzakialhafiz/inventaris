@@ -11,6 +11,13 @@
     </svg>
   </button>
 
+  {{-- Judul halaman — tampil di ponsel (≤576px) sebagai penanda lokasi,
+       menggantikan field search yang di sana diciutkan jadi ikon. --}}
+  <div class="topbar-title">
+    <div class="page-title">@yield('page-title', 'Dashboard')</div>
+    @hasSection('page-crumb')<div class="crumb">@yield('page-crumb')</div>@endif
+  </div>
+
   {{-- Global search — menelusuri seluruh menu --}}
   <form class="topbar-search" method="GET" action="{{ route('search.index') }}" role="search">
     <span class="search-ic">
@@ -20,6 +27,11 @@
            placeholder="Cari apa saja — barang, permintaan, pengguna…" x-ref="globalSearch" aria-label="Cari">
     <span class="search-kbd">/</span>
   </form>
+
+  {{-- Ikon cari (ponsel) — membuka halaman pencarian global khusus. --}}
+  <a href="{{ route('search.index') }}" class="icon-btn topbar-search-toggle" title="Cari" aria-label="Cari">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+  </a>
 
   <div class="topbar-right">
     {{-- Notifications --}}

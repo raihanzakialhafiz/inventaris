@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreKategoriRequest;
-use App\Http\Requests\UpdateKategoriRequest;
+use App\Http\Requests\KategoriRequest;
 use App\Models\Category;
 
 class KategoriController extends Controller
@@ -14,13 +13,13 @@ class KategoriController extends Controller
         return view('kategori.index', compact('kategori'));
     }
 
-    public function store(StoreKategoriRequest $request)
+    public function store(KategoriRequest $request)
     {
         Category::create($request->validated());
         return back()->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    public function update(UpdateKategoriRequest $request, Category $kategori)
+    public function update(KategoriRequest $request, Category $kategori)
     {
         $kategori->update($request->validated());
         return back()->with('success', 'Kategori berhasil diperbarui.');

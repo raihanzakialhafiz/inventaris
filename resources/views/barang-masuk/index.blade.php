@@ -201,7 +201,7 @@
                                 </div>
                             </template>
 
-                            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+                            <div class="modal-actions">
                                 <button type="button" class="btn btn-ghost" @click="showModal=false">Batal</button>
                                 <button type="submit" class="btn btn-pri">Simpan &amp; Perbarui Stok</button>
                             </div>

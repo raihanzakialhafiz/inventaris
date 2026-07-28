@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreSupplierRequest extends FormRequest
+class SupplierRequest extends FormRequest
 {
     /** Otorisasi ditangani middleware role pada route. */
     public function authorize(): bool
