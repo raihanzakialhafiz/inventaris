@@ -31,13 +31,18 @@
     {{-- Blok tanda tangan pimpinan, didorong ke kolom kanan. Ekspor lewat
          FromView (HTML) tidak bisa mengatur tinggi baris atau merge sel, jadi
          ruang tanda tangan dibentuk dengan baris kosong dan posisinya lewat
-         sel kosong ber-colspan. --}}
+         sel kosong ber-colspan. Urutan barisnya sengaja disamakan dengan PDF:
+         tanggal · jabatan · ruang tanda basah · nama (di atas garis) · NIP.
+
+         border-top pada sel nama = garis tanda tangan. Pembaca HTML Maatwebsite
+         tidak selalu memetakan border; kalau diabaikan, hasilnya tetap rapi —
+         nama tebal dengan ruang kosong di atasnya. Jadi ini peningkatan yang
+         aman, bukan taruhan. --}}
     @if($signer)
         @php
             // Sel kosong kiri mengisi kolom selain kolom terakhir.
             $kiri = max(1, count($headers) - 1);
         @endphp
-        <tr></tr>
         <tr></tr>
         <tr>
             <td colspan="{{ $kiri }}"></td>
@@ -52,7 +57,7 @@
         <tr></tr>
         <tr>
             <td colspan="{{ $kiri }}"></td>
-            <td style="font-weight:bold">{{ $signer['name'] }}</td>
+            <td style="font-weight:bold;border-top:1px solid #000000">{{ $signer['name'] }}</td>
         </tr>
         <tr>
             <td colspan="{{ $kiri }}"></td>

@@ -1,8 +1,4 @@
-{{--
-  Modal konfirmasi global (satu instance, dikendalikan public/js/ui-confirm.js).
-  Dipicu otomatis oleh <form data-confirm="…"> / <a data-confirm="…">,
-  atau secara imperatif via window.uiConfirm({ message, title, okLabel, variant }).
---}}
+
 <div id="confirm-modal" hidden aria-hidden="true">
   <div class="modal-overlay" style="display:block" data-confirm-cancel></div>
   <div class="modal" style="display:flex" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">

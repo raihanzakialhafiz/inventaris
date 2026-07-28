@@ -16,13 +16,7 @@
 
   @php $role = auth()->user()->role; @endphp
 
-  {{--
-    Navigasi dibangun dari satu sumber data agar rapi & tidak berulang.
-    - `active`  : pola route untuk state aktif (mis. 'barang.*').
-    - `icon`    : nama ikon SVG (lihat components/icon.blade.php).
-    - `variant` : warna badge sesuai makna — danger (perlu keputusan),
-                  warn (peringatan), info (antrian/informasi).
-  --}}
+
   @php
     $navGroups = [
       ['label' => null, 'items' => [

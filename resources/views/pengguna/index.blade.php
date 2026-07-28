@@ -131,8 +131,7 @@
     </div>
   </div>
 
-  {{-- Detail: hanya baca. Isian yang tak muat di tabel, terutama NIP & jabatan
-       yang dipakai blok tanda tangan laporan. --}}
+
   <template x-if="showDetail">
     <div>
       <div class="modal-overlay" style="display:block" @click="showDetail=false"></div>

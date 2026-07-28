@@ -30,8 +30,9 @@
     table.data tr:nth-child(even) td { background: #f6f9f8; }
     .empty { text-align: center; padding: 24px; color: #94a3b8; }
     /* page-break-inside: jangan sampai nama terpisah dari jabatannya antar halaman. */
-    table.ttd { width: 100%; margin-top: 30px; border: none; page-break-inside: avoid; }
-    table.ttd td { border: none; vertical-align: top; padding: 0; font-size: 10px; }
+    table.ttd { width: 100%; margin-top: 36px; border: none; page-break-inside: avoid; }
+    /* Semua hitam pekat — blok tanda tangan sering dicetak & difotokopi B/W. */
+    table.ttd td { border: none; vertical-align: top; padding: 0; font-size: 10.5px; color: #000; line-height: 1.5; }
     /* Blok menyusut selebar baris terpanjangnya lalu menempel ke margin kanan,
        berapa pun panjang jabatannya. Lebar tetap (mis. 35%) tidak bisa: jabatan
        pendek menyisakan celah lebar di kanan, jabatan panjang terpotong.
@@ -42,11 +43,19 @@
        width:1% memaksanya ke min-content; sel kosong menyerap sisanya.
 
        padding-right memberi jarak dari tepi kertas: sel menempel margin kanan,
-       jadi padding-nya mendorong teks ke kiri tanpa mengunci lebar blok. */
-    table.ttd .blok { width: 1%; white-space: nowrap; padding-right: 30px; }
-    table.ttd .ruang { height: 58px; }
-    table.ttd .nama { font-weight: bold; text-decoration: underline; }
-    .foot { margin-top: 18px; font-size: 9px; color: #94a3b8; text-align: right; }
+       jadi padding-nya mendorong teks ke kiri tanpa mengunci lebar blok.
+
+       Baris-baris dipecah jadi <div> (bukan <br>) agar tiap baris bisa diberi
+       jarak sendiri — ini yang bikin bloknya rapi, bukan menempel padat. */
+    table.ttd .blok { width: 1%; white-space: nowrap; padding-right: 34px; text-align: left; }
+    table.ttd .tgl { margin-bottom: 1px; }
+    table.ttd .jab { margin-bottom: 2px; }
+    /* Ruang tanda basah; garis tipis di bawahnya jadi tempat membubuhkan tanda
+       tangan, lalu nama tercetak persis di atas garis identitas. */
+    table.ttd .ruang { height: 56px; border-bottom: 1px solid #000; }
+    table.ttd .nama { font-weight: bold; padding-top: 3px; }
+    table.ttd .nip  { color: #334155; font-size: 10px; }
+    .foot { margin-top: 20px; padding-top: 6px; border-top: 1px solid #e2e8f0; font-size: 9px; color: #94a3b8; text-align: right; }
   </style>
 </head>
 <body>
@@ -99,10 +108,11 @@
              DomPDF tidak menangani float/margin-left:auto pada tabel seandal ini. --}}
         <td></td>
         <td class="blok">
-          {{ $place ? $place . ', ' : '' }}{{ now()->isoFormat('D MMMM YYYY') }}<br>{{ $signer['jabatan'] }}
+          <div class="tgl">{{ $place ? $place . ', ' : '' }}{{ now()->isoFormat('D MMMM YYYY') }}</div>
+          <div class="jab">{{ $signer['jabatan'] }}</div>
           <div class="ruang"></div>
-          <span class="nama">{{ $signer['name'] }}</span><br>
-          NIP. {{ $signer['nip'] ?: '-' }}
+          <div class="nama">{{ $signer['name'] }}</div>
+          <div class="nip">NIP. {{ $signer['nip'] ?: '-' }}</div>
         </td>
       </tr>
     </table>

@@ -1,7 +1,4 @@
-{{--
-  Peringatan sesi hampir berakhir (idle timeout) — dikendalikan public/js/app-shell.js.
-  Muncul WARN_MS sebelum logout otomatis; hanya tombol "Tetap Masuk" yang memperpanjang.
---}}
+
 <div id="idle-warning" hidden>
   <div class="modal-overlay" style="display:block"></div>
   <div class="modal" style="display:flex" role="alertdialog" aria-modal="true" aria-labelledby="idle-title">

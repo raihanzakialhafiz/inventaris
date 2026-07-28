@@ -5,7 +5,6 @@
 
 @section('content')
 @php
-  // Prefill dari DB; bila kosong pakai nilai .env (config) sebagai acuan.
   $val = fn ($key, $default = '') => old($key, $settings[$key] ?? $default);
 @endphp
 
@@ -13,12 +12,6 @@
   {{-- .mc-h/.mc-ic/.mc-side dan .save-bar didefinisikan di siatk.css —
        dipakai bersama halaman Pengaturan Sistem. --}}
   .mail-wrap { max-width: 760px; }
-  /* Panduan App Password: panel yang membuka ke bawah, bukan popover melayang.
-     Popover sebelumnya tertimpa kartu berikutnya — dulu .card menjalankan
-     animasi fadeUp (transform) sehingga tiap kartu jadi stacking context dan
-     z-index popover terkurung di dalam kartunya sendiri. Animasi itu sudah
-     dihapus, tapi panel inline tetap dipertahankan: ia tidak bisa tertimpa
-     sama sekali, tanpa bergantung pada urutan lapisan. */
   .guide-btn {
     display: inline-flex; align-items: center; gap: 5px; border: 0; background: none;
     padding: 0; cursor: pointer; color: var(--primary-dark);
@@ -34,9 +27,6 @@
   @media (max-width: 720px) { .mail-grid { grid-template-columns: 1fr !important; } }
 </style>
 
-{{-- dirty: form sudah diubah tapi belum disimpan. Email uji memakai konfigurasi
-     TERSIMPAN, jadi menguji sebelum menyimpan memakai nilai lama — gagalnya
-     menyesatkan. --}}
 <div class="mail-wrap" x-data="{ dirty: false, guide: false }">
   <div class="page-head" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
     <div>
@@ -87,8 +77,7 @@
             <button type="button" class="guide-btn" style="margin-top:6px" @click="guide = ! guide">
               <span x-text="guide ? '▾' : '▸'"></span> Cara mendapatkan App Password Gmail
             </button>
-            {{-- x-transition (Alpine inti), bukan x-collapse: plugin Collapse
-                 tidak dipasang di build self-host ini. --}}
+
             <div class="guide" x-show="guide" x-cloak x-transition.opacity.duration.150ms>
               <b>Ini bukan password akun Google Anda.</b>
               <ol>
@@ -153,8 +142,7 @@
       </div>
     </div>
     <div class="card-b">
-      {{-- Perubahan belum disimpan → uji memakai nilai lama dan kegagalannya
-           menyesatkan. Peringatkan, jangan biarkan pengguna tertipu. --}}
+
       <div class="notice warn" style="margin:0 0 12px" x-show="dirty" x-cloak>
         <span class="ic"><x-icon name="alert" /></span>
         <div>Ada perubahan yang belum disimpan. Klik <b>Simpan Pengaturan Email</b> dulu — jika tidak, email uji masih memakai konfigurasi lama.</div>

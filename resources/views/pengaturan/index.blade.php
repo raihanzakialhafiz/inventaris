@@ -5,7 +5,7 @@
 
 @section('content')
 <style>
-  /* Tata letak tab: kartu nav di kiri, kartu isi di kanan. */
+
   .set-wrap { display: grid; grid-template-columns: 230px 1fr; gap: 22px; align-items: start; }
   .set-nav {
     position: sticky; top: 16px; display: flex; flex-direction: column; gap: 4px;
@@ -22,7 +22,7 @@
   .set-nav button.on { background: var(--primary-soft); color: var(--primary-dark); }
   .set-nav button svg { flex: 0 0 auto; }
   .settings { max-width: 780px; min-width: 0; }
-  /* Judul & deskripsi bagian pindah ke kepala kartu (dulu kolom kiri). */
+
   .set-card { margin-bottom: 18px; }
   .set-card .card-h h3 { margin-bottom: 3px; }
   .set-card .card-h p { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
@@ -37,9 +37,6 @@
   .img-box .meta { min-width: 0; flex: 1; }
   .img-box .meta b { font-size: 13px; }
   .img-box .meta span { display: block; font-size: 12px; color: var(--muted); }
-  /* Pratinjau kop — meniru proporsi template PDF (logo kiri, teks terpusat
-     pada halaman, garis tebal penutup). Perkiraan tampilan, bukan ukuran
-     presisi: yang dijaga urutan baris & tata letaknya. */
   .kop-prev {
     margin-top: 16px; padding: 16px; border: 1px solid var(--line);
     border-radius: 12px; background: #fff; color: #000;
@@ -57,8 +54,7 @@
   .kp-i { font-size: 15px; font-weight: 700; }
   .kp-a { font-size: 8.5px; }
   .kp-judul { text-align: center; font-size: 12px; font-weight: 700; margin: 12px 0 0; }
-  /* .save-bar didefinisikan di siatk.css — dipakai bersama Pengaturan Email. */
-  /* Layar sempit: nav jadi baris ikon yang bisa digeser mendatar. */
+
   @media (max-width: 900px) {
     .set-wrap { grid-template-columns: 1fr; }
     .set-nav { position: static; flex-direction: row; overflow-x: auto; }
@@ -79,9 +75,7 @@
   ];
 @endphp
 
-{{-- Tab memakai x-show (bukan x-if): isian tab tersembunyi HARUS tetap ada di
-     DOM agar ikut terkirim — seluruh halaman ini satu form dengan satu tombol
-     simpan. --}}
+
 <div class="page-head">
   <h2>Pengaturan Sistem</h2>
   <p>Konfigurasi global aplikasi {{ setting('app_name', 'SIIB') }} — perubahan langsung berlaku di seluruh sistem.</p>
@@ -102,12 +96,7 @@
     <div class="notice warn" style="margin-bottom:16px"><span class="ic"><x-icon name="alert" /></span><div>{{ $errors->first() }}</div></div>
   @endif
 
-  {{-- Isian wajib yang tersembunyi tidak bisa difokuskan browser: form menolak
-       submit TANPA pesan apa pun. Pindah dulu ke tab yang bermasalah, lalu
-       reportValidity SETELAH tab-nya tampil ($nextTick) supaya gelembung pesan
-       browser benar-benar muncul — tanpa itu pengguna harus klik Simpan dua
-       kali. Guard k !== tab mencegah loop: reportValidity memicu invalid lagi,
-       tapi saat itu tab sudah benar. --}}
+
   <form method="POST" action="{{ route('pengaturan.update') }}" enctype="multipart/form-data"
         @invalid.capture="const t = $event.target, k = t.closest('[data-tab]')?.dataset.tab;
                           if (k && k !== tab) { tab = k; $nextTick(() => t.reportValidity()); }">
@@ -129,8 +118,7 @@
       </div>
     </div>
 
-    {{-- Kop surat: keempat barisnya dikumpulkan di satu tempat, urut sesuai
-         tampilannya di laporan, dengan pratinjau langsung. --}}
+
     <div class="card set-card" data-tab="kop" x-show="tab === 'kop'" x-cloak
          x-data='{
            gov:  @json(old('government_name', $settings['government_name'] ?? '')),
@@ -265,8 +253,7 @@
       </div>
     </div>
 
-    {{-- Footer — Email Kontak pindah ke Kop Surat (baris ke-4 kop), dan
-         Telepon Kontak dihapus: tidak pernah dirender di output mana pun. --}}
+
     <div class="card set-card" data-tab="kontak" x-show="tab === 'kontak'" x-cloak>
       <div class="card-h">
         <h3>Footer Laporan</h3>

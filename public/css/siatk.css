@@ -539,7 +539,7 @@ tbody tr:hover { background: var(--row-hover); }
   display: block; width: 0; height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  opacity: .25; transition: opacity .12s;
+  opacity: .25; transition: opacity var(--dur-1) var(--ease-out);
 }
 .si-up { border-bottom: 5px solid currentColor; }
 .si-dn { border-top:    5px solid currentColor; }
@@ -560,6 +560,37 @@ tbody tr:hover { background: var(--row-hover); }
 .filter-bar select.inp       { width: auto; min-width: 130px; }
 .filter-spacer { flex: 1; }
 .filter-count { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+
+/* ---------- EXPORT TOOLS (<x-export-ttd>) ----------
+   Satu kelompok kontrol yang menyatu: toggle tanda tangan · pemisah · tombol
+   format tergabung. Tanpa kotak pembungkus tambahan — tombol segmented sudah
+   jadi jangkar visualnya, jadi tak perlu kartu di dalam kartu. */
+.export-tools { display: inline-flex; align-items: center; gap: 11px; flex-wrap: wrap; }
+.export-sign {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+.export-sign input[type=checkbox] { margin: 0; }
+.export-div { width: 1px; height: 22px; background: var(--line-strong); flex: 0 0 auto; }
+
+/* Dua tombol format berbagi satu tepi (segmented). margin-left:-1px meleburkan
+   border kembar; z-index saat hover/fokus mengangkat tombol aktif agar
+   border & cincin fokusnya tak tertutup tetangganya. */
+.export-actions { display: inline-flex; }
+.export-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; font-size: 12.5px; font-weight: 700;
+  color: var(--ink-2); background: var(--surface);
+  border: 1px solid var(--line-strong); text-decoration: none;
+  transition: background-color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.export-btn:first-child { border-radius: var(--radius-xs) 0 0 var(--radius-xs); }
+.export-btn:last-child  { border-radius: 0 var(--radius-xs) var(--radius-xs) 0; margin-left: -1px; }
+.export-btn:only-child  { border-radius: var(--radius-xs); }
+.export-btn:hover  { background: var(--primary-soft); border-color: var(--primary-dark); color: var(--primary-dark); position: relative; z-index: 1; }
+.export-btn:active { background: var(--primary-soft-2); }
+.export-btn:focus-visible { position: relative; z-index: 1; }
 
 /* Per-page selector (in the pagination bar) */
 .per-page { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); white-space: nowrap; }

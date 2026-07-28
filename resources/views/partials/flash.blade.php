@@ -1,7 +1,4 @@
-{{--
-  Menyuntikkan pesan flash server (success/error/warning/info + error validasi)
-  sebagai JSON agar ditampilkan sebagai toast oleh public/js/ui-toast.js.
---}}
+
 @php
   $flash = [
       'success' => array_values(array_filter([session('success')])),

@@ -1,7 +1,4 @@
-{{--
-  Kerangka halaman error (403/404/419/500/503) — berdiri sendiri:
-  tanpa query DB, tanpa aset eksternal, agar tetap tampil walau aplikasi bermasalah.
---}}
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

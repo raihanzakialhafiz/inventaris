@@ -3,12 +3,7 @@
 
 @section('content')
 @php
-  // [label, kelas-badge, nada warna, nama ikon] per jenis notifikasi.
-  //
-  // Ikon diambil dari <x-icon> — bukan emoji. Emoji dirender oleh sistem
-  // operasi, jadi tampilannya berbeda di tiap perangkat dan goresannya tidak
-  // pernah cocok dengan set ikon garis yang dipakai seluruh aplikasi.
-  // Warna dibawa oleh nada semantik (tone-*), bukan hex lepas per baris.
+
   $typeMeta = [
     'new_request'         => ['Permintaan Baru',      'b-primary', 'primary', 'mail'],
     'request_approved'    => ['Permintaan Disetujui', 'b-ok',      'ok',      'check-circle'],
@@ -44,8 +39,7 @@
   <div class="card-b" style="padding:6px 0">
     @forelse($notifications as $n)
       @php $meta = $typeMeta[$n->type] ?? [ucfirst(str_replace('_',' ',$n->type)), 'b-neutral', 'neutral', 'dot']; @endphp
-      {{-- Tanpa garis tebal di tepi kiri: jenis notifikasi sudah dibawa oleh
-           warna lingkaran ikon DAN oleh badge bertuliskan namanya. --}}
+
       <div class="notif-row {{ $n->is_read ? '' : 'unread' }}">
         <a href="{{ route('notifikasi.read', $n) }}" class="notif-row-main">
           <span class="notif-ic tone-{{ $meta[2] }}"><x-icon :name="$meta[3]" /></span>
