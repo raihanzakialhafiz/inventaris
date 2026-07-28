@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
         // (redirect 80→443 tetap tugas web server — lihat DEPLOYMENT.md).
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
+            // Paku host URL absolut ke APP_URL, bukan header Host request. Tanpa ini
+            // penyerang bisa POST /forgot-password dengan Host palsu sehingga tautan
+            // reset (berisi token) di email korban menuju domain penyerang.
+            URL::forceRootUrl(config('app.url'));
         }
 
         Paginator::defaultView('vendor.pagination.default');
