@@ -92,6 +92,40 @@ class PenggunaTest extends TestCase
         $this->assertSame('Pengelola Barang', $baru->jabatan);
     }
 
+    /**
+     * Regresi: validasi gagal sempat menutup modal dan mengosongkan seluruh
+     * isian. Modal harus terbuka kembali dengan ketikan pengguna masih utuh.
+     */
+    public function test_validasi_gagal_membuka_ulang_modal_dengan_isian_utuh(): void
+    {
+        $this->actingAs($this->admin)
+            ->from('/pengguna')
+            ->followingRedirects()
+            ->post('/pengguna', [
+                'name'      => 'Pegawai Baru',
+                'email'     => $this->admin->email,   // duplikat → gagal
+                'password'  => 'rahasia123',
+                'role'      => 'petugas_gudang',
+                'is_active' => 1,
+            ])
+            ->assertOk()
+            ->assertSee('showModal: true', false)   // modal terbuka lagi
+            ->assertSee('Pegawai Baru');            // ketikan tidak hilang
+    }
+
+    public function test_bidang_wajib_untuk_kepala_bidang(): void
+    {
+        $this->actingAs($this->admin)->post('/pengguna', [
+            'name'      => 'Kabid Tanpa Bidang',
+            'email'     => 'kabid@siatk.test',
+            'password'  => 'rahasia123',
+            'role'      => 'kepala_bidang',
+            'is_active' => 1,
+        ])->assertSessionHasErrors('department_id');
+
+        $this->assertDatabaseMissing('users', ['email' => 'kabid@siatk.test']);
+    }
+
     public function test_nip_dan_jabatan_tersimpan_lewat_form_edit(): void
     {
         $lain = $this->makeUser('pimpinan');

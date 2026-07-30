@@ -134,7 +134,10 @@ class DepartmentQuotaService
             ]
             : [
                 'quota'             => $item->monthlyQuota(),
-                'threshold_percent' => 150,
+                // 100% = kuota adalah batas nyata, sama seperti aturan baru dari
+                // halaman Kuota Bidang — agar meter "sisa" di Sisa Kuota Bidang
+                // sinkron dengan ambang yang benar-benar ditegakkan.
+                'threshold_percent' => 100,
                 'cooldown_days'     => 0,
                 'policy'            => 'warn',
                 'period_type'       => 'monthly',

@@ -666,6 +666,76 @@ tbody tr:hover { background: var(--row-hover); }
 .field .help { color: var(--muted); font-weight: 400; font-size: 11.5px; margin-top: 3px; display: block; }
 /* Pesan validasi inline di bawah isian — pengganti toast untuk error form. */
 .field .err  { color: var(--danger); font-weight: 600; font-size: 11.5px; margin-top: 3px; display: block; }
+
+/* Penanda wajib. aria-hidden di markup: atribut `required` sudah jadi sinyal
+   resmi untuk pembaca layar, bintangnya murni penanda visual. */
+.req { color: var(--danger); }
+
+/* Judul kelompok isian — memecah form panjang tanpa menambah kotak. */
+.form-sec {
+  font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--muted); margin: 20px 0 13px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.form-sec:first-child { margin-top: 0; }
+
+/* Segmented control untuk pilihan biner: radio disembunyikan, label jadi tombol.
+   Satu ketukan, nilainya terbaca tanpa perlu dibuka. inline-flex, bukan flex:
+   kontrol dua opsi yang dipaksa selebar modal jadi bilah raksasa yang bobot
+   visualnya melebihi field wajib di atasnya. */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.seg input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.seg label {
+  flex: 0 0 auto; min-width: 88px; margin: 0; text-align: center;
+  padding: 9px 14px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--muted); background: var(--surface);
+  border-right: 1px solid var(--line);
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.seg label:last-of-type { border-right: none; }
+.seg label:hover { background: var(--surface-2); color: var(--ink); }
+.seg input:checked + label { background: var(--primary-dark); color: var(--on-accent); }
+.seg input:focus-visible + label { outline: 2px solid var(--primary-dark); outline-offset: -2px; }
+
+/* Baris saklar: keterangan konsekuensi di kiri, kontrol di kanan. Untuk pilihan
+   yang mengubah PERILAKU akun, bukan isian data — dibedakan dari .field supaya
+   tidak terbaca sebagai kolom biasa. */
+.switch-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 15px; margin-top: 16px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: background-color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
+}
+.switch-row__text { flex: 1; min-width: 0; }
+.switch-row__text b    { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+.switch-row__text span { display: block; font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+/* Keadaan yang mencabut akses diberi tanda — bukan alarm, sekadar terbaca. */
+.switch-row.is-off             { background: var(--danger-bg); border-color: var(--danger-line); }
+.switch-row.is-off .switch-row__text b    { color: var(--danger-2); }
+.switch-row.is-off .switch-row__text span { color: var(--danger-2); }
+@media (max-width: 576px) {
+  .switch-row { flex-direction: column; align-items: stretch; gap: 12px; }
+  .switch-row .seg { display: flex; }
+  .switch-row .seg label { flex: 1; min-width: 0; }
+}
+
+/* Blok isian opsional yang dilipat — <details> native, tanpa JS. */
+.fold { border: 1px solid var(--line); border-radius: var(--radius); margin-top: 18px; }
+.fold > summary {
+  display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
+  padding: 11px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  border-radius: var(--radius);
+}
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before {
+  content: '▸'; display: inline-block; color: var(--muted);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.fold[open] > summary::before { transform: rotate(90deg); }
+.fold > summary:hover { background: var(--surface-2); }
+.fold > summary:focus-visible { outline: 2px solid var(--primary-dark); outline-offset: -2px; }
+.fold__body { padding: 0 14px 14px; }
 input[type=text],
 input[type=number],
 input[type=email],

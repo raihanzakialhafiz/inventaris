@@ -14,6 +14,22 @@ class StoreKuotaRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Disembunyikan dari modal & dikunci di sini — merge() menimpa apa pun yang
+     * dikirim browser. Kuota = batas nyata (threshold 100%), cooldown mati,
+     * selalu bulanan, berlaku hari ini. Kolomnya tetap ada: baris lama dengan
+     * nilai lain tetap dihormati, dan field bisa dimunculkan lagi kapan saja.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'period_type'       => 'monthly',
+            'threshold_percent' => 100,
+            'cooldown_days'     => 0,
+            'effective_from'    => today()->toDateString(),
+        ]);
+    }
+
     public function rules(): array
     {
         return [

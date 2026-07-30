@@ -17,8 +17,7 @@
         <table>
           <thead><tr>
             <th>Bidang</th><th>Barang / Kategori</th><th>Periode</th>
-            <th class="num">Kuota</th><th class="num">Threshold</th><th class="num">Cooldown</th>
-            <th>Kebijakan</th><th>Status</th><th>Aksi</th>
+            <th class="num">Kuota</th><th>Bila Terlampaui</th><th>Status</th><th>Aksi</th>
           </tr></thead>
           <tbody>
             @foreach($kuota as $k)
@@ -30,13 +29,11 @@
                 <td class="t-sub">{{ $k->item?->name ?? ($k->category?->name ?? 'Semua barang') }}</td>
                 <td>{{ ucfirst($k->period_type) }}</td>
                 <td class="num">{{ $k->quota_quantity }}</td>
-                <td class="num">{{ $k->threshold_percent }}%</td>
-                <td class="num">{{ $k->cooldown_days }} hari</td>
-                <td><span class="badge {{ $k->policy === 'block' ? 'b-danger' : 'b-warn' }}">{{ ucfirst($k->policy) }}</span></td>
+                <td><span class="badge {{ $k->policy === 'block' ? 'b-danger' : 'b-warn' }}">{{ $k->policy === 'block' ? 'Tolak' : 'Wajib justifikasi' }}</span></td>
                 <td><span class="badge {{ $k->is_active ? 'b-ok' : 'b-neutral' }}">{{ $k->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                 <td style="white-space:nowrap">
                   <button class="btn btn-ghost btn-sm"
-                    @click="showModal=true; editData={{ json_encode(['id'=>$k->id,'quota_quantity'=>$k->quota_quantity,'threshold_percent'=>$k->threshold_percent,'cooldown_days'=>$k->cooldown_days,'policy'=>$k->policy,'is_active'=>$k->is_active]) }}">
+                    @click="showModal=true; editData={{ json_encode(['id'=>$k->id,'quota_quantity'=>$k->quota_quantity,'policy'=>$k->policy,'is_active'=>$k->is_active]) }}">
                     Edit
                   </button>
                   <form method="POST" action="{{ route('kuota.destroy', $k) }}" style="display:inline"
@@ -79,60 +76,54 @@
             @csrf
             <template x-if="editData.id"><input type="hidden" name="_method" value="PUT"></template>
 
+            {{-- Periode, berlaku-mulai, threshold & cooldown tidak lagi ditanyakan:
+                 dikunci di StoreKuotaRequest agar modal cukup 4 isian. --}}
             <template x-if="!editData.id">
-              <div>
+              <div x-data="{ scope: 'all' }">
                 <div class="field">
                   <label>Bidang</label>
-                  <x-searchable-select name="department_id" :options="$departments" x-model="editData.department_id"
+                  <x-searchable-select name="department_id" :options="$departments"
                                        placeholder="Semua Bidang" search-placeholder="Cari bidang…" />
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-                  <div class="field" style="margin:0">
-                    <label>Barang (opsional)</label>
-                    <x-searchable-select name="item_id" :options="$items" x-model="editData.item_id"
-                                         placeholder="Semua barang" search-placeholder="Cari barang…" />
-                  </div>
-                  <div class="field" style="margin:0">
-                    <label>Kategori (opsional)</label>
-                    <x-searchable-select name="category_id" :options="$categories" x-model="editData.category_id"
-                                         placeholder="Semua kategori" search-placeholder="Cari kategori…" />
-                  </div>
+                <div class="field">
+                  <label>Berlaku untuk</label>
+                  <select class="inp" x-model="scope">
+                    <option value="all">Semua barang</option>
+                    <option value="category">Kategori tertentu</option>
+                    <option value="item">Barang tertentu</option>
+                  </select>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
-                  <div class="field" style="margin:0">
-                    <label>Periode</label>
-                    <select name="period_type" class="inp">
-                      <option value="monthly">Bulanan</option>
-                      <option value="quarterly">Triwulan</option>
-                      <option value="yearly">Tahunan</option>
-                    </select>
+                {{-- x-if, bukan x-show: pilihan yang tidak dipakai keluar dari DOM
+                     sehingga tak ikut terkirim — item_id & category_id mustahil
+                     terisi bersamaan (kombinasi itu membuat kategori diabaikan
+                     diam-diam oleh DepartmentQuotaService::resolve()). --}}
+                <template x-if="scope === 'category'">
+                  <div class="field">
+                    <label>Kategori</label>
+                    <x-searchable-select name="category_id" :options="$categories" required
+                                         placeholder="— Pilih kategori —" search-placeholder="Cari kategori…" />
                   </div>
-                  <div class="field" style="margin:0">
-                    <label>Berlaku Mulai</label>
-                    <input type="date" name="effective_from" value="{{ today()->format('Y-m-d') }}" required>
+                </template>
+                <template x-if="scope === 'item'">
+                  <div class="field">
+                    <label>Barang</label>
+                    <x-searchable-select name="item_id" :options="$items" required
+                                         placeholder="— Pilih barang —" search-placeholder="Cari barang…" />
                   </div>
-                </div>
+                </template>
               </div>
             </template>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
               <div class="field" style="margin:0">
-                <label>Kuota Maksimum</label>
+                <label>Kuota per Bulan</label>
                 <input type="number" name="quota_quantity" :value="editData.quota_quantity||10" min="1" required>
               </div>
               <div class="field" style="margin:0">
-                <label>Threshold Anomali (%)</label>
-                <input type="number" name="threshold_percent" :value="editData.threshold_percent||150" min="100" max="500">
-              </div>
-              <div class="field" style="margin:0">
-                <label>Cooldown (hari)</label>
-                <input type="number" name="cooldown_days" :value="editData.cooldown_days||14" min="0">
-              </div>
-              <div class="field" style="margin:0">
-                <label>Kebijakan Pelanggaran</label>
+                <label>Bila Terlampaui</label>
                 <select name="policy" class="inp">
-                  <option value="warn" :selected="editData.policy==='warn'">Peringatan (Warn)</option>
-                  <option value="block" :selected="editData.policy==='block'">Blokir (Block)</option>
+                  <option value="warn" :selected="editData.policy==='warn'">Izinkan, wajib isi justifikasi</option>
+                  <option value="block" :selected="editData.policy==='block'">Tolak permintaan</option>
                 </select>
               </div>
             </div>

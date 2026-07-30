@@ -109,13 +109,18 @@ class QuotaTest extends TestCase
 
     public function test_tanpa_kuota_pakai_heuristik(): void
     {
-        // minimum_stock 10 → monthlyQuota 20 → limit 30. qty 25 lolos tanpa flag.
+        // minimum_stock 10 → monthlyQuota 20 → limit 20 (threshold 100%).
         $this->actingAs($this->kabid)->post('/permintaan', [
-            'items' => [['item_id' => $this->item->id, 'qty' => 25]],
+            'items' => [['item_id' => $this->item->id, 'qty' => 20]],
         ]);
 
         $this->assertDatabaseCount('requests', 1);
         $this->assertFalse(ItemRequest::first()->is_flagged);
+
+        // Lewat batas → wajib justifikasi (fallback selalu warn, tak pernah block).
+        $this->actingAs($this->kabid)
+            ->post('/permintaan', ['items' => [['item_id' => $this->item->id, 'qty' => 1]]])
+            ->assertSessionHasErrors('justification');
     }
 
     public function test_aturan_duplikat_cakupan_sama_ditolak(): void
@@ -144,17 +149,22 @@ class QuotaTest extends TestCase
         $this->quota('warn'); // aturan barang
 
         // Aturan default bidang (tanpa barang/kategori) — cakupan berbeda.
+        // Modal hanya mengirim bidang, kuota & kebijakan; sisanya dikunci server.
         $this->actingAs($this->makeUser('admin'))->post('/kuota', [
             'department_id'     => $this->kabid->department_id,
-            'period_type'       => 'monthly',
             'quota_quantity'    => 50,
-            'threshold_percent' => 150,
-            'cooldown_days'     => 0,
             'policy'            => 'warn',
-            'effective_from'    => today()->toDateString(),
+            'threshold_percent' => 150,   // dikirim iseng — harus ditimpa jadi 100
         ])->assertSessionDoesntHaveErrors();
 
         $this->assertDatabaseCount('request_quotas', 2);
+        $this->assertDatabaseHas('request_quotas', [
+            'quota_quantity'    => 50,
+            'threshold_percent' => 100,
+            'cooldown_days'     => 0,
+            'period_type'       => 'monthly',
+            'effective_from'    => today()->toDateTimeString(),
+        ]);
     }
 
     public function test_aktifkan_ulang_aturan_yang_menabrak_ditolak(): void

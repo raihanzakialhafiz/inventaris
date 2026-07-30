@@ -12,8 +12,32 @@
     'kepala_bidang'  => 'Kepala Bidang',
     'pimpinan'       => 'Pimpinan',
   ];
+  // Ringkasan hak akses per peran — diturunkan dari grup middleware di routes/web.php.
+  $roleHints = [
+    'admin'          => 'Akses penuh: master data, pengguna, pengaturan, dan seluruh transaksi.',
+    'kasubag_umum'   => 'Menyetujui atau menolak permintaan, mengubah barang, dan membuka laporan.',
+    'petugas_gudang' => 'Mencatat barang masuk, stock opname, dan mendistribusikan permintaan.',
+    'kepala_bidang'  => 'Mengajukan permintaan atas nama bidangnya. Wajib dipasangkan ke satu Bidang.',
+    'pimpinan'       => 'Hanya melihat: laporan, dashboard, dan data barang.',
+  ];
 @endphp
-<div x-data="{ showModal: false, editData: {}, showDetail: false, detailData: {} }">
+{{-- Saat validasi gagal, modal dibuka kembali dengan isian old() — tanpa ini
+     halaman reload menutup modal dan seluruh ketikan pengguna hilang. --}}
+<div x-data="{
+       showModal: {{ $errors->any() ? 'true' : 'false' }},
+       editData: {{ json_encode($errors->any() ? [
+         'id'            => old('editing_id') ?: null,
+         'name'          => old('name'),
+         'email'         => old('email'),
+         'nip'           => old('nip'),
+         'jabatan'       => old('jabatan'),
+         'role'          => old('role', ''),
+         'department_id' => old('department_id', ''),
+         'is_active'     => old('is_active', '1'),
+       ] : new \stdClass) }},
+       roleHints: {{ json_encode($roleHints) }},
+       showDetail: false, detailData: {}
+     }">
 
   <div class="page-head" style="display:flex;align-items:center;justify-content:space-between">
     <div><h2>Manajemen Pengguna</h2><p>Kelola akun dan hak akses pengguna sistem.</p></div>
@@ -133,7 +157,7 @@
 
 
   <template x-if="showDetail">
-    <div>
+    <div @keydown.escape.window="showDetail=false">
       <div class="modal-overlay" style="display:block" @click="showDetail=false"></div>
       <div class="modal" style="display:flex">
         <div class="modal-head">
@@ -205,7 +229,7 @@
   </template>
 
   <template x-if="showModal">
-    <div>
+    <div @keydown.escape.window="showModal=false">
       <div class="modal-overlay" style="display:block" @click="showModal=false"></div>
       <div class="modal" style="display:flex">
         <div class="modal-head">
@@ -214,57 +238,103 @@
         </div>
         <div class="modal-body">
           <form :action="editData.id ? '/pengguna/'+editData.id : '/pengguna'" method="POST"
-                x-effect="if (editData.role !== 'kepala_bidang') editData.department_id = ''">
+                x-data="{ saving: false }" @submit="saving = true">
             @csrf
             <template x-if="editData.id"><input type="hidden" name="_method" value="PUT"></template>
+            {{-- Ikut terkirim agar modal terbuka ulang dalam mode yang sama saat validasi gagal. --}}
+            <input type="hidden" name="editing_id" :value="editData.id||''">
+
+            <div class="form-sec">Identitas</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
               <div class="field" style="margin:0">
-                <label>Nama Lengkap <span style="color:var(--danger)">*</span></label>
-                <input type="text" name="name" :value="editData.name||''" required>
+                <label>Nama Lengkap <span class="req" aria-hidden="true">*</span></label>
+                <input type="text" name="name" :value="editData.name||''" required
+                       x-init="$nextTick(() => $el.focus())">
+                @error('name')<span class="err">{{ $message }}</span>@enderror
               </div>
               <div class="field" style="margin:0">
-                <label>Email <span style="color:var(--danger)">*</span></label>
+                <label>Email <span class="req" aria-hidden="true">*</span></label>
                 <input type="email" name="email" :value="editData.email||''" required>
-              </div>
-
-              {{-- NIP & jabatan dipakai blok tanda tangan laporan PDF/Excel. --}}
-              <div class="field" style="margin:0">
-                <label>NIP</label>
-                <input type="text" name="nip" :value="editData.nip||''" placeholder="Untuk tanda tangan laporan">
-              </div>
-              <div class="field" style="margin:0">
-                <label>Jabatan</label>
-                <input type="text" name="jabatan" :value="editData.jabatan||''" placeholder="mis. Kepala Dinas Kominfo">
-                <span class="help">Kosong → memakai label peran.</span>
-              </div>
-
-              <div class="field" style="margin:0">
-                <label>Role <span style="color:var(--danger)">*</span></label>
-                <x-searchable-select name="role" :options="$roles" x-model="editData.role"
-                                     placeholder="— Pilih Role —" search-placeholder="Cari role…" required />
-              </div>
-              <div class="field" style="margin:0">
-                <label>Status</label>
-                <x-searchable-select name="is_active" :options="['1' => 'Aktif', '0' => 'Nonaktif']" x-model="editData.is_active"
-                                     placeholder="— Pilih —" search-placeholder="" />
-              </div>
-
-              {{-- Bidang hanya relevan untuk Kepala Bidang --}}
-              <div class="field" style="margin:0;grid-column:1/-1" x-show="editData.role === 'kepala_bidang'" x-cloak>
-                <label>Bidang <span style="color:var(--danger)">*</span></label>
-                <x-searchable-select name="department_id" :options="$departments" x-model="editData.department_id"
-                                     placeholder="— Pilih Bidang —" search-placeholder="Cari bidang…" />
-              </div>
-
-              <div class="field" style="margin:0;grid-column:1/-1">
-                <label>Password <span x-show="!editData.id" style="color:var(--danger)">*</span></label>
-                <x-password-input name="password" placeholder="Isi untuk mengubah password" autocomplete="new-password" :meter="true" />
-                <span class="help" x-show="editData.id">Kosongkan jika tidak ingin mengubah.</span>
+                @error('email')<span class="err">{{ $message }}</span>@enderror
               </div>
             </div>
-            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+
+            {{-- Selebar modal, bukan dua kolom: keterangan hak akses di bawah Role
+                 butuh ruang, dan sel kanan akan menganggur untuk 4 dari 5 peran. --}}
+            <div class="form-sec">Akses</div>
+            <div class="field" style="margin:0">
+              <label>Role <span class="req" aria-hidden="true">*</span></label>
+              <x-searchable-select name="role" :options="$roles" x-model="editData.role"
+                                   placeholder="— Pilih Role —" search-placeholder="Cari role…" required />
+              <span class="help" x-text="roleHints[editData.role] || 'Menentukan menu dan hak akses pengguna.'"></span>
+              @error('role')<span class="err">{{ $message }}</span>@enderror
+            </div>
+
+            {{-- x-if, bukan x-show: field keluar dari DOM saat peran lain dipilih.
+                 Dengan x-show, input tersembunyi tetap ikut terkirim dan `required`
+                 pada field tak terlihat membuat browser gagal submit diam-diam. --}}
+            <template x-if="editData.role === 'kepala_bidang'">
+              <div class="field" style="margin:14px 0 0">
+                <label>Bidang <span class="req" aria-hidden="true">*</span></label>
+                <x-searchable-select name="department_id" :options="$departments" x-model="editData.department_id"
+                                     placeholder="— Pilih Bidang —" search-placeholder="Cari bidang…" required />
+                <span class="help">Permintaan barang yang diajukan akan tercatat atas nama bidang ini.</span>
+                @error('department_id')<span class="err">{{ $message }}</span>@enderror
+              </div>
+            </template>
+
+            {{-- Status bukan isian data melainkan saklar akses: nonaktif memblokir
+                 login (LoginController) sekaligus reset password. Keterangannya
+                 ikut berubah supaya konsekuensinya terbaca saat dipilih. --}}
+            <div class="switch-row" :class="{ 'is-off': editData.is_active === '0' }">
+              <div class="switch-row__text">
+                <b>Status akun</b>
+                <span x-text="editData.is_active === '0'
+                        ? 'Tidak bisa login maupun meminta reset password. Data lamanya tetap tersimpan.'
+                        : 'Bisa masuk dan memakai sistem sesuai perannya.'"></span>
+              </div>
+              <div class="seg">
+                <input type="radio" id="ua-on"  name="is_active" value="1" x-model="editData.is_active">
+                <label for="ua-on">Aktif</label>
+                <input type="radio" id="ua-off" name="is_active" value="0" x-model="editData.is_active">
+                <label for="ua-off">Nonaktif</label>
+              </div>
+            </div>
+            @error('is_active')<span class="err" style="display:block;margin-top:5px">{{ $message }}</span>@enderror
+
+            <div class="form-sec">Kredensial</div>
+            <div class="field" style="margin:0">
+              <label>Password <span class="req" x-show="!editData.id" x-cloak aria-hidden="true">*</span></label>
+              <x-password-input name="password" autocomplete="new-password" :meter="true"
+                                x-bind:required="!editData.id"
+                                x-bind:placeholder="editData.id ? 'Kosongkan bila tidak diubah' : 'Minimal 8 karakter, huruf dan angka'" />
+              @error('password')<span class="err">{{ $message }}</span>@enderror
+            </div>
+
+            {{-- NIP & jabatan hanya dipakai blok tanda tangan laporan PDF/Excel —
+                 dilipat agar modal tidak jadi dinding isian. Terbuka sendiri bila
+                 sudah terisi (mode edit / isian yang gagal validasi). --}}
+            <details class="fold" :open="!!(editData.nip || editData.jabatan)">
+              <summary>Tanda tangan laporan (opsional)</summary>
+              <div class="fold__body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="field" style="margin:0">
+                  <label>NIP</label>
+                  <input type="text" name="nip" :value="editData.nip||''" placeholder="mis. 19801231 200604 1 002">
+                  @error('nip')<span class="err">{{ $message }}</span>@enderror
+                </div>
+                <div class="field" style="margin:0">
+                  <label>Jabatan</label>
+                  <input type="text" name="jabatan" :value="editData.jabatan||''" placeholder="mis. Kepala Dinas Kominfo">
+                  <span class="help">Kosong → memakai label peran.</span>
+                  @error('jabatan')<span class="err">{{ $message }}</span>@enderror
+                </div>
+              </div>
+            </details>
+
+            <div class="modal-actions">
               <button type="button" class="btn btn-ghost" @click="showModal=false">Batal</button>
-              <button type="submit" class="btn btn-pri">Simpan</button>
+              <button type="submit" class="btn btn-pri" :disabled="saving"
+                      x-text="saving ? 'Menyimpan…' : 'Simpan'">Simpan</button>
             </div>
           </form>
         </div>

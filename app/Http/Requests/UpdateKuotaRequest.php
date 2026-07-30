@@ -14,6 +14,21 @@ class UpdateKuotaRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Ambil dari baris yang ada, bukan konstanta: aturan lama yang terlanjur
+     * bernilai lain tidak boleh berubah diam-diam hanya karena admin mengedit
+     * kuotanya.
+     */
+    protected function prepareForValidation(): void
+    {
+        $kuotum = $this->route('kuotum');
+
+        $this->merge([
+            'threshold_percent' => $kuotum->threshold_percent,
+            'cooldown_days'     => $kuotum->cooldown_days,
+        ]);
+    }
+
     public function rules(): array
     {
         return [
