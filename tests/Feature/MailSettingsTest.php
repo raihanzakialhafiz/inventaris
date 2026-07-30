@@ -49,4 +49,37 @@ class MailSettingsTest extends TestCase
     {
         $this->actingAs($this->makeUser('kepala_bidang'))->get('/pengaturan/email')->assertForbidden();
     }
+
+    /**
+     * Status halaman tidak boleh mengaku "aktif" hanya karena kolomnya terisi —
+     * kredensial salah baru ketahuan saat benar-benar mengirim.
+     */
+    public function test_status_hanya_aktif_setelah_email_uji_berhasil(): void
+    {
+        $admin = $this->makeUser('admin');
+
+        // Belum diisi sama sekali.
+        $this->actingAs($admin)->get('/pengaturan/email')
+            ->assertOk()->assertSee('Belum dikonfigurasi');
+
+        // Terisi, tapi belum pernah diuji → belum boleh mengaku aktif.
+        Setting::updateOrCreate(['key' => 'mail_from_address'], ['value' => 'akun@gmail.com', 'type' => 'text']);
+        Setting::updateOrCreate(['key' => 'mail_password'], ['value' => Crypt::encryptString('rahasia123'), 'type' => 'secret']);
+
+        $this->actingAs($admin)->get('/pengaturan/email')
+            ->assertOk()->assertSee('Belum diverifikasi')->assertDontSee('Email aktif');
+
+        // Uji terakhir berhasil.
+        Setting::updateOrCreate(['key' => 'mail_last_test_at'], ['value' => now()->toDateTimeString(), 'type' => 'text']);
+        Setting::updateOrCreate(['key' => 'mail_last_test_ok'], ['value' => '1', 'type' => 'text']);
+
+        $this->actingAs($admin)->get('/pengaturan/email')
+            ->assertOk()->assertSee('Email aktif');
+
+        // Uji terakhir gagal → turun lagi, bukan tetap hijau.
+        Setting::updateOrCreate(['key' => 'mail_last_test_ok'], ['value' => '0', 'type' => 'text']);
+
+        $this->actingAs($admin)->get('/pengaturan/email')
+            ->assertOk()->assertSee('Email uji terakhir gagal');
+    }
 }

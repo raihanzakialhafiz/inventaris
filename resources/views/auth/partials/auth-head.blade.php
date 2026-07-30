@@ -10,6 +10,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
 <style>
+    :root {
+        /* Disalin PERSIS dari --sans di siatk.css — halaman auth berdiri sendiri
+           dan tidak memuat stylesheet utama, jadi stack-nya harus dikutip utuh
+           agar fallback-nya sama saat Google Fonts gagal dimuat. */
+        --sans: 'Plus Jakarta Sans', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    }
+
     *,
     *::before,
     *::after {
@@ -19,7 +26,9 @@
     }
 
     body {
-        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.5;
         -webkit-font-smoothing: antialiased;
         background: #faf9f5;
         color: #0f172a;
@@ -27,6 +36,11 @@
         display: grid;
         place-items: center;
         padding: 24px;
+    }
+
+    h1,
+    h2 {
+        letter-spacing: -.01em;
     }
 
     .auth-card {
@@ -63,7 +77,7 @@
     .brand-name {
         font-weight: 800;
         font-size: 16px;
-        letter-spacing: -.3px;
+        letter-spacing: -.02em;
     }
 
     .brand-sub {
@@ -75,7 +89,7 @@
     h1.title {
         font-size: 21px;
         font-weight: 800;
-        letter-spacing: -.4px;
+        letter-spacing: -.02em;
         margin-bottom: 6px;
     }
 

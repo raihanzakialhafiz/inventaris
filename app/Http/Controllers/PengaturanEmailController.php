@@ -34,6 +34,23 @@ class PengaturanEmailController extends Controller
         // salah satu kosong = jatuh ke .env, yang belum tentu diisi.
         $configured = $hasPassword && filled($settings['mail_from_address'] ?? config('mail.from.address'));
 
+        // Terisi ≠ benar. Kredensial salah baru ketahuan saat mengirim, jadi
+        // status hanya boleh mengaku "aktif" bila email uji terakhir berhasil.
+        $lastTest = rescue(
+            fn () => filled($settings['mail_last_test_at'] ?? null)
+                ? Carbon::parse($settings['mail_last_test_at'])
+                : null,
+            rescue: null,
+            report: false,
+        );
+        $lastTestOk = ($settings['mail_last_test_ok'] ?? null) === '1';
+
+        $status = match (true) {
+            ! $configured             => 'off',    // belum diisi
+            $lastTest && $lastTestOk  => 'ok',     // terbukti terkirim
+            default                   => 'warn',   // terisi tapi belum/gagal diuji
+        };
+
         // Ditulis penjadwal tiap kali email stok menipis terkirim. Nilai rusak
         // (edit manual di DB) tidak boleh mematikan halaman ini — tanpa halaman
         // ini, admin justru kehilangan satu-satunya tempat memperbaikinya.
@@ -45,7 +62,9 @@ class PengaturanEmailController extends Controller
             report: false,
         );
 
-        return view('pengaturan-email.index', compact('settings', 'hasPassword', 'configured', 'lastSent'));
+        return view('pengaturan-email.index', compact(
+            'settings', 'hasPassword', 'configured', 'lastSent', 'status', 'lastTest', 'lastTestOk'
+        ));
     }
 
     public function update(Request $request)
@@ -86,9 +105,20 @@ class PengaturanEmailController extends Controller
                 'Buka Sistem',
             ));
 
+            $this->recordTest(true);
+
             return back()->with('success', "Email uji terkirim ke {$request->test_email}. Silakan cek kotak masuk.");
         } catch (\Throwable $e) {
+            $this->recordTest(false);
+
             return back()->with('error', 'Gagal mengirim email uji: ' . $e->getMessage());
         }
+    }
+
+    /** Hasil uji terakhir — satu-satunya bukti bahwa kredensial benar-benar jalan. */
+    private function recordTest(bool $ok): void
+    {
+        Setting::updateOrCreate(['key' => 'mail_last_test_at'], ['value' => now()->toDateTimeString(), 'type' => 'text']);
+        Setting::updateOrCreate(['key' => 'mail_last_test_ok'], ['value' => $ok ? '1' : '0', 'type' => 'text']);
     }
 }

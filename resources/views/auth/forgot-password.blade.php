@@ -29,7 +29,7 @@
             @csrf
             <label class="lbl" for="email">Alamat Email</label>
             <input type="email" id="email" name="email" class="inp" value="{{ old('email') }}"
-                placeholder="nama@instansi.go.id" required autofocus>
+                placeholder="nama@gmail.com" required autofocus>
             <button type="submit" class="btn-main">Kirim Tautan Reset</button>
         </form>
 

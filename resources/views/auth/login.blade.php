@@ -10,8 +10,12 @@
     @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {{-- JetBrains Mono tidak lagi dimuat: satu-satunya pemakainya adalah kolom
+         email, yang kini ikut sans seperti seluruh input lain di aplikasi.
+         Satu unduhan font yang memblokir render jadi hilang dari halaman
+         pertama yang dilihat pengguna. --}}
     <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
 
@@ -38,6 +42,13 @@
             --danger-2: #B91C1C;
             --danger-bg: #FEE2E2;
             --danger-line: #FECACA;
+            /* Disalin PERSIS dari --sans di siatk.css. Halaman ini berdiri
+               sendiri (tidak memuat siatk.css) supaya paint pertama cepat, jadi
+               stack-nya harus dikutip utuh — versi lama memotong Roboto/
+               Helvetica/Arial, sehingga saat Google Fonts gagal dimuat, login
+               jatuh ke sans-serif generik sementara sisa aplikasi jatuh ke
+               Roboto. Dua rupa huruf berbeda di mesin yang sama. */
+            --sans: 'Plus Jakarta Sans', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
             --radius-xs: 8px;
             --radius-sm: 10px;
             --radius: 12px;
@@ -59,11 +70,22 @@
             height: 100%;
         }
 
+        /* font-size & line-height mengikuti dasar siatk.css — sebelumnya tidak
+           diset, jadi apa pun yang tidak diberi ukuran sendiri memakai 16px/
+           normal bawaan browser, bukan ritme aplikasi. */
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            font-family: var(--sans);
+            font-size: 14px;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             background: var(--surface);
             color: var(--ink);
+        }
+
+        /* Sejajar dengan `h1,h2,h3,h4` di siatk.css. */
+        h1,
+        h2 {
+            letter-spacing: -.01em;
         }
 
         :focus-visible {
@@ -116,10 +138,13 @@
             flex: 0 0 auto;
         }
 
+        /* Tracking dalam em, bukan px: pada breakpoint 420px .login-title turun
+           25px → 23px, dan nilai px membuat jaraknya ikut melonggar relatif
+           terhadap huruf. em ikut mengecil sendiri. */
         .brand-name {
             font-weight: 800;
             font-size: 17px;
-            letter-spacing: -.3px;
+            letter-spacing: -.02em;
             line-height: 1.1;
         }
 
@@ -135,7 +160,7 @@
             margin: 0;
             font-size: 25px;
             font-weight: 800;
-            letter-spacing: -.5px;
+            letter-spacing: -.02em;
         }
 
         .login-desc {
@@ -169,10 +194,6 @@
             outline: none;
             font-family: inherit;
             color: var(--ink);
-        }
-
-        .inp.mono {
-            font-family: 'JetBrains Mono', monospace;
         }
 
         .inp.has-toggle {
@@ -418,7 +439,7 @@
             gap: 7px;
             font-size: 12px;
             font-weight: 700;
-            letter-spacing: .4px;
+            letter-spacing: .03em;
             background: rgba(255, 255, 255, .16);
             padding: 6px 12px;
             border-radius: 20px;
@@ -429,7 +450,7 @@
             margin: 0;
             font-size: 34px;
             font-weight: 800;
-            letter-spacing: -1px;
+            letter-spacing: -.03em;
             line-height: 1.14;
             max-width: 460px;
         }
@@ -534,8 +555,8 @@
 
                     <label class="lbl" for="email">Alamat Email</label>
                     <div class="inp-wrap">
-                        <input type="email" id="email" name="email" class="inp mono" value="{{ old('email') }}"
-                            placeholder="nama@instansi.go.id" required autofocus autocomplete="email">
+                        <input type="email" id="email" name="email" class="inp" value="{{ old('email') }}"
+                            placeholder="nama@gmail.com" required autofocus autocomplete="email">
                     </div>
 
                     <label class="lbl" for="password">Kata Sandi</label>

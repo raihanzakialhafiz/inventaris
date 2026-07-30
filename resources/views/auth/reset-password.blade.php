@@ -28,7 +28,7 @@
 
             <label class="lbl" for="email">Alamat Email</label>
             <input type="email" id="email" name="email" class="inp" value="{{ old('email', $email) }}"
-                placeholder="nama@instansi.go.id" required>
+                placeholder="nama@gmail.com" required>
 
             <label class="lbl" for="password">Kata Sandi Baru</label>
             <x-password-input id="password" name="password" class="inp" placeholder="••••••••" required autofocus />
